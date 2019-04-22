@@ -1,0 +1,30 @@
+{
+  "roles": [
+    {
+      "name": "Confirm user identity",
+      "id": "AUTHORIZE_ROLE",
+      "params": [
+        "User"
+      ]
+    }
+  ],
+  "environments": {
+    "default": {
+      "network": "development",
+      "appName": "myid.aragonpm.eth"
+    },
+    "staging": {
+      "registry": "0x98df287b6c145399aaa709692c8d308357bc085d",
+      "appName": "myid.open.aragonpm.eth",
+      "wsRPC": "wss://rinkeby.eth.aragon.network/ws",
+      "network": "rinkeby"
+    },
+    "production": {
+      "registry": "0x314159265dd8dbb310642f98f50c066173c1259b",
+      "appName": "myid.open.aragonpm.eth",
+      "wsRPC": "wss://mainnet.eth.aragon.network/ws",
+      "network": "mainnet"
+    }
+  },
+  "path": "contracts/MyID.sol"
+}
