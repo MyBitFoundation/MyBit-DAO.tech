@@ -1,0 +1,10 @@
+{
+  "name": "MyTokens",
+  "description": "Allows an organization to lock a designated ERC-20 token to receive voting tokens. The organization may set lock times that can increase voting shares",
+  "icons": [{
+    "src": "/images/icon.svg",
+    "sizes": "22x22"
+  }],
+  "start_url": "/index.html",
+  "script": "/script.js"
+}

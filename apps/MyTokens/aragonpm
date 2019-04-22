@@ -1,0 +1,5 @@
+aragon apm publish patch --only-content --environment staging --files app/build --use-frame
+
+aragon apm publish minor --only-content --environment staging --files app/build --use-frame
+
+aragon apm publish major --environment staging --files app/build --use-frame

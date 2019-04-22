@@ -1,0 +1,28 @@
+{
+  "name": "mybit-dao.tech",
+  "version": "1.0.0",
+  "description": "Custom aragon apps + template for deploying the MyBit DAO",
+  "main": "truffle.js",
+  "dependencies": {
+    "bignumber.js": "^8.1.1",
+    "homedir": "^0.6.0",
+    "path": "^0.12.7",
+    "truffle-hdwallet-provider": "^1.0.7",
+    "truffle-hdwallet-provider-privkey": "^0.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./deploy.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MyBitFoundation/MyBit-DAO.tech.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MyBitFoundation/MyBit-DAO.tech/issues"
+  },
+  "homepage": "https://github.com/MyBitFoundation/MyBit-DAO.tech#readme"
+}

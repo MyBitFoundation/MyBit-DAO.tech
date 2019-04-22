@@ -1,0 +1,22 @@
+{
+  "name": "mybittemplate",
+  "version": "0.0.1",
+  "description": "Template for deploying MyBitDAO",
+  "scripts": {
+    "coverage": "SOLIDITY_COVERAGE=true npm run ganache-cli:test",
+    "ganache-cli:test": "../shared/test-helpers/ganache-cli.sh",
+    "lint": "solium --dir ./contracts",
+    "start:template": "aragon run --template MyBitTemplate",
+    "test:gas": "GAS_REPORTER=true npm test",
+    "test": "TRUFFLE_TEST=true npm run ganache-cli:test"
+  },
+  "dependencies": {
+    "@aragon/apps-finance": "^3.0.0",
+    "@aragon/apps-shared-minime": "^1.0.1",
+    "@aragon/apps-voting": "^2.0.0",
+    "@aragon/os": "^4.2.0"
+  },
+  "author": "mybit",
+  "keywords": [],
+  "license": "GPL-3.0"
+}
