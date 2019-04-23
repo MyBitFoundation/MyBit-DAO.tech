@@ -3,22 +3,22 @@
   "abi": [],
   "bytecode": "0x604c602c600b82828239805160001a60731460008114601c57601e565bfe5b5030600052607381538281f30073000000000000000000000000000000000000000030146080604052600080fd00a165627a7a7230582091cf9047bf29d7a0ac09d0a5054eae40c5c669a12582a9ec376d318147ae865b0029",
   "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fd00a165627a7a7230582091cf9047bf29d7a0ac09d0a5054eae40c5c669a12582a9ec376d318147ae865b0029",
-  "sourceMap": "27:1274:24:-;;132:2:-1;166:7;155:9;146:7;137:37;252:7;246:14;243:1;238:23;232:4;229:33;270:1;265:20;;;;222:63;;265:20;274:9;222:63;;298:9;295:1;288:20;328:4;319:7;311:22;352:7;343;336:24",
-  "deployedSourceMap": "27:1274:24:-;;;;;;;;",
+  "sourceMap": "27:1274:23:-;;132:2:-1;166:7;155:9;146:7;137:37;252:7;246:14;243:1;238:23;232:4;229:33;270:1;265:20;;;;222:63;;265:20;274:9;222:63;;298:9;295:1;288:20;328:4;319:7;311:22;352:7;343;336:24",
+  "deployedSourceMap": "27:1274:23:-;;;;;;;;",
   "source": "pragma solidity ^0.4.24;\n\n\nlibrary ConversionHelpers {\n    string private constant ERROR_IMPROPER_LENGTH = \"CONVERSION_IMPROPER_LENGTH\";\n\n    function dangerouslyCastUintArrayToBytes(uint256[] memory _input) internal pure returns (bytes memory output) {\n        // Force cast the uint256[] into a bytes array, by overwriting its length\n        // Note that the bytes array doesn't need to be initialized as we immediately overwrite it\n        // with the input and a new length. The input becomes invalid from this point forward.\n        uint256 byteLength = _input.length * 32;\n        assembly {\n            output := _input\n            mstore(output, byteLength)\n        }\n    }\n\n    function dangerouslyCastBytesToUintArray(bytes memory _input) internal pure returns (uint256[] memory output) {\n        // Force cast the bytes array into a uint256[], by overwriting its length\n        // Note that the uint256[] doesn't need to be initialized as we immediately overwrite it\n        // with the input and a new length. The input becomes invalid from this point forward.\n        uint256 intsLength = _input.length / 32;\n        require(_input.length == intsLength * 32, ERROR_IMPROPER_LENGTH);\n\n        assembly {\n            output := _input\n            mstore(output, intsLength)\n        }\n    }\n}\n",
   "sourcePath": "@aragon/os/contracts/common/ConversionHelpers.sol",
   "ast": {
     "absolutePath": "@aragon/os/contracts/common/ConversionHelpers.sol",
     "exportedSymbols": {
       "ConversionHelpers": [
-        10201
+        10137
       ]
     },
-    "id": 10202,
+    "id": 10138,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 10153,
+        "id": 10089,
         "literals": [
           "solidity",
           "^",
@@ -26,7 +26,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:24"
+        "src": "0:24:23"
       },
       {
         "baseContracts": [],
@@ -34,20 +34,20 @@
         "contractKind": "library",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 10201,
+        "id": 10137,
         "linearizedBaseContracts": [
-          10201
+          10137
         ],
         "name": "ConversionHelpers",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 10156,
+            "id": 10092,
             "name": "ERROR_IMPROPER_LENGTH",
             "nodeType": "VariableDeclaration",
-            "scope": 10201,
-            "src": "59:76:24",
+            "scope": 10137,
+            "src": "59:76:23",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -55,10 +55,10 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 10154,
+              "id": 10090,
               "name": "string",
               "nodeType": "ElementaryTypeName",
-              "src": "59:6:24",
+              "src": "59:6:23",
               "typeDescriptions": {
                 "typeIdentifier": "t_string_storage_ptr",
                 "typeString": "string"
@@ -67,14 +67,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "434f4e56455253494f4e5f494d50524f5045525f4c454e475448",
-              "id": 10155,
+              "id": 10091,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "107:28:24",
+              "src": "107:28:23",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_ae6d458f7ae195283b1a4bf6b9fa548b37b2bd69e195d2a474f8d91bafa132ba",
@@ -86,22 +86,22 @@
           },
           {
             "body": {
-              "id": 10172,
+              "id": 10108,
               "nodeType": "Block",
-              "src": "252:429:24",
+              "src": "252:429:23",
               "statements": [
                 {
                   "assignments": [
-                    10165
+                    10101
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 10165,
+                      "id": 10101,
                       "name": "byteLength",
                       "nodeType": "VariableDeclaration",
-                      "scope": 10173,
-                      "src": "538:18:24",
+                      "scope": 10109,
+                      "src": "538:18:23",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -109,10 +109,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 10164,
+                        "id": 10100,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "538:7:24",
+                        "src": "538:7:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -122,14 +122,14 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 10170,
+                  "id": 10106,
                   "initialValue": {
                     "argumentTypes": null,
                     "commonType": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 10169,
+                    "id": 10105,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -138,18 +138,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 10166,
+                        "id": 10102,
                         "name": "_input",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10159,
-                        "src": "559:6:24",
+                        "referencedDeclaration": 10095,
+                        "src": "559:6:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
                           "typeString": "uint256[] memory"
                         }
                       },
-                      "id": 10167,
+                      "id": 10103,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -157,7 +157,7 @@
                       "memberName": "length",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "559:13:24",
+                      "src": "559:13:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -168,14 +168,14 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "3332",
-                      "id": 10168,
+                      "id": 10104,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "575:2:24",
+                      "src": "575:2:23",
                       "subdenomination": null,
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_32_by_1",
@@ -183,63 +183,63 @@
                       },
                       "value": "32"
                     },
-                    "src": "559:18:24",
+                    "src": "559:18:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "538:39:24"
+                  "src": "538:39:23"
                 },
                 {
                   "externalReferences": [
                     {
                       "_input": {
-                        "declaration": 10159,
+                        "declaration": 10095,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "620:6:24",
+                        "src": "620:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10162,
+                        "declaration": 10098,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "610:6:24",
+                        "src": "610:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10162,
+                        "declaration": 10098,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "646:6:24",
+                        "src": "646:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "byteLength": {
-                        "declaration": 10165,
+                        "declaration": 10101,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "654:10:24",
+                        "src": "654:10:23",
                         "valueSize": 1
                       }
                     }
                   ],
-                  "id": 10171,
+                  "id": 10107,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    output := _input\n    mstore(output, byteLength)\n}",
-                  "src": "587:94:24"
+                  "src": "587:94:23"
                 }
               ]
             },
             "documentation": null,
-            "id": 10173,
+            "id": 10109,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -247,16 +247,16 @@
             "name": "dangerouslyCastUintArrayToBytes",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 10160,
+              "id": 10096,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10159,
+                  "id": 10095,
                   "name": "_input",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10173,
-                  "src": "183:23:24",
+                  "scope": 10109,
+                  "src": "183:23:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -265,19 +265,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 10157,
+                      "id": 10093,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "183:7:24",
+                      "src": "183:7:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 10158,
+                    "id": 10094,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "183:9:24",
+                    "src": "183:9:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[]"
@@ -287,20 +287,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "182:25:24"
+              "src": "182:25:23"
             },
             "payable": false,
             "returnParameters": {
-              "id": 10163,
+              "id": 10099,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10162,
+                  "id": 10098,
                   "name": "output",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10173,
-                  "src": "231:19:24",
+                  "scope": 10109,
+                  "src": "231:19:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -308,10 +308,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 10161,
+                    "id": 10097,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "231:5:24",
+                    "src": "231:5:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -321,32 +321,32 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "230:21:24"
+              "src": "230:21:23"
             },
-            "scope": 10201,
-            "src": "142:539:24",
+            "scope": 10137,
+            "src": "142:539:23",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "internal"
           },
           {
             "body": {
-              "id": 10199,
+              "id": 10135,
               "nodeType": "Block",
-              "src": "797:502:24",
+              "src": "797:502:23",
               "statements": [
                 {
                   "assignments": [
-                    10182
+                    10118
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 10182,
+                      "id": 10118,
                       "name": "intsLength",
                       "nodeType": "VariableDeclaration",
-                      "scope": 10200,
-                      "src": "1081:18:24",
+                      "scope": 10136,
+                      "src": "1081:18:23",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -354,10 +354,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 10181,
+                        "id": 10117,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1081:7:24",
+                        "src": "1081:7:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -367,14 +367,14 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 10187,
+                  "id": 10123,
                   "initialValue": {
                     "argumentTypes": null,
                     "commonType": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 10186,
+                    "id": 10122,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -383,18 +383,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 10183,
+                        "id": 10119,
                         "name": "_input",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10175,
-                        "src": "1102:6:24",
+                        "referencedDeclaration": 10111,
+                        "src": "1102:6:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
                         }
                       },
-                      "id": 10184,
+                      "id": 10120,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -402,7 +402,7 @@
                       "memberName": "length",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1102:13:24",
+                      "src": "1102:13:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -413,14 +413,14 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "3332",
-                      "id": 10185,
+                      "id": 10121,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1118:2:24",
+                      "src": "1118:2:23",
                       "subdenomination": null,
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_32_by_1",
@@ -428,14 +428,14 @@
                       },
                       "value": "32"
                     },
-                    "src": "1102:18:24",
+                    "src": "1102:18:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1081:39:24"
+                  "src": "1081:39:23"
                 },
                 {
                   "expression": {
@@ -447,7 +447,7 @@
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         },
-                        "id": 10194,
+                        "id": 10130,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -456,18 +456,18 @@
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 10189,
+                            "id": 10125,
                             "name": "_input",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 10175,
-                            "src": "1138:6:24",
+                            "referencedDeclaration": 10111,
+                            "src": "1138:6:23",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes_memory_ptr",
                               "typeString": "bytes memory"
                             }
                           },
-                          "id": 10190,
+                          "id": 10126,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -475,7 +475,7 @@
                           "memberName": "length",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "1138:13:24",
+                          "src": "1138:13:23",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
@@ -489,19 +489,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 10193,
+                          "id": 10129,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 10191,
+                            "id": 10127,
                             "name": "intsLength",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 10182,
-                            "src": "1155:10:24",
+                            "referencedDeclaration": 10118,
+                            "src": "1155:10:23",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -512,14 +512,14 @@
                           "rightExpression": {
                             "argumentTypes": null,
                             "hexValue": "3332",
-                            "id": 10192,
+                            "id": 10128,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "kind": "number",
                             "lValueRequested": false,
                             "nodeType": "Literal",
-                            "src": "1168:2:24",
+                            "src": "1168:2:23",
                             "subdenomination": null,
                             "typeDescriptions": {
                               "typeIdentifier": "t_rational_32_by_1",
@@ -527,13 +527,13 @@
                             },
                             "value": "32"
                           },
-                          "src": "1155:15:24",
+                          "src": "1155:15:23",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           }
                         },
-                        "src": "1138:32:24",
+                        "src": "1138:32:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -541,12 +541,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 10195,
+                        "id": 10131,
                         "name": "ERROR_IMPROPER_LENGTH",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10156,
-                        "src": "1172:21:24",
+                        "referencedDeclaration": 10092,
+                        "src": "1172:21:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory",
                           "typeString": "string memory"
@@ -564,21 +564,21 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 10188,
+                      "id": 10124,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        13951,
-                        13952
+                        13887,
+                        13888
                       ],
-                      "referencedDeclaration": 13952,
-                      "src": "1130:7:24",
+                      "referencedDeclaration": 13888,
+                      "src": "1130:7:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 10196,
+                    "id": 10132,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -586,64 +586,64 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1130:64:24",
+                    "src": "1130:64:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 10197,
+                  "id": 10133,
                   "nodeType": "ExpressionStatement",
-                  "src": "1130:64:24"
+                  "src": "1130:64:23"
                 },
                 {
                   "externalReferences": [
                     {
                       "_input": {
-                        "declaration": 10175,
+                        "declaration": 10111,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1238:6:24",
+                        "src": "1238:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10179,
+                        "declaration": 10115,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1228:6:24",
+                        "src": "1228:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10179,
+                        "declaration": 10115,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1264:6:24",
+                        "src": "1264:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "intsLength": {
-                        "declaration": 10182,
+                        "declaration": 10118,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1272:10:24",
+                        "src": "1272:10:23",
                         "valueSize": 1
                       }
                     }
                   ],
-                  "id": 10198,
+                  "id": 10134,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    output := _input\n    mstore(output, intsLength)\n}",
-                  "src": "1205:94:24"
+                  "src": "1205:94:23"
                 }
               ]
             },
             "documentation": null,
-            "id": 10200,
+            "id": 10136,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -651,16 +651,16 @@
             "name": "dangerouslyCastBytesToUintArray",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 10176,
+              "id": 10112,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10175,
+                  "id": 10111,
                   "name": "_input",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10200,
-                  "src": "728:19:24",
+                  "scope": 10136,
+                  "src": "728:19:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -668,10 +668,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 10174,
+                    "id": 10110,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "728:5:24",
+                    "src": "728:5:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -681,20 +681,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "727:21:24"
+              "src": "727:21:23"
             },
             "payable": false,
             "returnParameters": {
-              "id": 10180,
+              "id": 10116,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10179,
+                  "id": 10115,
                   "name": "output",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10200,
-                  "src": "772:23:24",
+                  "scope": 10136,
+                  "src": "772:23:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -703,19 +703,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 10177,
+                      "id": 10113,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "772:7:24",
+                      "src": "772:7:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 10178,
+                    "id": 10114,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "772:9:24",
+                    "src": "772:9:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[]"
@@ -725,33 +725,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "771:25:24"
+              "src": "771:25:23"
             },
-            "scope": 10201,
-            "src": "687:612:24",
+            "scope": 10137,
+            "src": "687:612:23",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 10202,
-        "src": "27:1274:24"
+        "scope": 10138,
+        "src": "27:1274:23"
       }
     ],
-    "src": "0:1302:24"
+    "src": "0:1302:23"
   },
   "legacyAST": {
     "absolutePath": "@aragon/os/contracts/common/ConversionHelpers.sol",
     "exportedSymbols": {
       "ConversionHelpers": [
-        10201
+        10137
       ]
     },
-    "id": 10202,
+    "id": 10138,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 10153,
+        "id": 10089,
         "literals": [
           "solidity",
           "^",
@@ -759,7 +759,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:24"
+        "src": "0:24:23"
       },
       {
         "baseContracts": [],
@@ -767,20 +767,20 @@
         "contractKind": "library",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 10201,
+        "id": 10137,
         "linearizedBaseContracts": [
-          10201
+          10137
         ],
         "name": "ConversionHelpers",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 10156,
+            "id": 10092,
             "name": "ERROR_IMPROPER_LENGTH",
             "nodeType": "VariableDeclaration",
-            "scope": 10201,
-            "src": "59:76:24",
+            "scope": 10137,
+            "src": "59:76:23",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -788,10 +788,10 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 10154,
+              "id": 10090,
               "name": "string",
               "nodeType": "ElementaryTypeName",
-              "src": "59:6:24",
+              "src": "59:6:23",
               "typeDescriptions": {
                 "typeIdentifier": "t_string_storage_ptr",
                 "typeString": "string"
@@ -800,14 +800,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "434f4e56455253494f4e5f494d50524f5045525f4c454e475448",
-              "id": 10155,
+              "id": 10091,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "107:28:24",
+              "src": "107:28:23",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_ae6d458f7ae195283b1a4bf6b9fa548b37b2bd69e195d2a474f8d91bafa132ba",
@@ -819,22 +819,22 @@
           },
           {
             "body": {
-              "id": 10172,
+              "id": 10108,
               "nodeType": "Block",
-              "src": "252:429:24",
+              "src": "252:429:23",
               "statements": [
                 {
                   "assignments": [
-                    10165
+                    10101
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 10165,
+                      "id": 10101,
                       "name": "byteLength",
                       "nodeType": "VariableDeclaration",
-                      "scope": 10173,
-                      "src": "538:18:24",
+                      "scope": 10109,
+                      "src": "538:18:23",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -842,10 +842,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 10164,
+                        "id": 10100,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "538:7:24",
+                        "src": "538:7:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -855,14 +855,14 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 10170,
+                  "id": 10106,
                   "initialValue": {
                     "argumentTypes": null,
                     "commonType": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 10169,
+                    "id": 10105,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -871,18 +871,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 10166,
+                        "id": 10102,
                         "name": "_input",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10159,
-                        "src": "559:6:24",
+                        "referencedDeclaration": 10095,
+                        "src": "559:6:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
                           "typeString": "uint256[] memory"
                         }
                       },
-                      "id": 10167,
+                      "id": 10103,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -890,7 +890,7 @@
                       "memberName": "length",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "559:13:24",
+                      "src": "559:13:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -901,14 +901,14 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "3332",
-                      "id": 10168,
+                      "id": 10104,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "575:2:24",
+                      "src": "575:2:23",
                       "subdenomination": null,
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_32_by_1",
@@ -916,63 +916,63 @@
                       },
                       "value": "32"
                     },
-                    "src": "559:18:24",
+                    "src": "559:18:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "538:39:24"
+                  "src": "538:39:23"
                 },
                 {
                   "externalReferences": [
                     {
                       "_input": {
-                        "declaration": 10159,
+                        "declaration": 10095,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "620:6:24",
+                        "src": "620:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10162,
+                        "declaration": 10098,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "610:6:24",
+                        "src": "610:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10162,
+                        "declaration": 10098,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "646:6:24",
+                        "src": "646:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "byteLength": {
-                        "declaration": 10165,
+                        "declaration": 10101,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "654:10:24",
+                        "src": "654:10:23",
                         "valueSize": 1
                       }
                     }
                   ],
-                  "id": 10171,
+                  "id": 10107,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    output := _input\n    mstore(output, byteLength)\n}",
-                  "src": "587:94:24"
+                  "src": "587:94:23"
                 }
               ]
             },
             "documentation": null,
-            "id": 10173,
+            "id": 10109,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -980,16 +980,16 @@
             "name": "dangerouslyCastUintArrayToBytes",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 10160,
+              "id": 10096,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10159,
+                  "id": 10095,
                   "name": "_input",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10173,
-                  "src": "183:23:24",
+                  "scope": 10109,
+                  "src": "183:23:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -998,19 +998,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 10157,
+                      "id": 10093,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "183:7:24",
+                      "src": "183:7:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 10158,
+                    "id": 10094,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "183:9:24",
+                    "src": "183:9:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[]"
@@ -1020,20 +1020,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "182:25:24"
+              "src": "182:25:23"
             },
             "payable": false,
             "returnParameters": {
-              "id": 10163,
+              "id": 10099,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10162,
+                  "id": 10098,
                   "name": "output",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10173,
-                  "src": "231:19:24",
+                  "scope": 10109,
+                  "src": "231:19:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1041,10 +1041,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 10161,
+                    "id": 10097,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "231:5:24",
+                    "src": "231:5:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -1054,32 +1054,32 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "230:21:24"
+              "src": "230:21:23"
             },
-            "scope": 10201,
-            "src": "142:539:24",
+            "scope": 10137,
+            "src": "142:539:23",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "internal"
           },
           {
             "body": {
-              "id": 10199,
+              "id": 10135,
               "nodeType": "Block",
-              "src": "797:502:24",
+              "src": "797:502:23",
               "statements": [
                 {
                   "assignments": [
-                    10182
+                    10118
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 10182,
+                      "id": 10118,
                       "name": "intsLength",
                       "nodeType": "VariableDeclaration",
-                      "scope": 10200,
-                      "src": "1081:18:24",
+                      "scope": 10136,
+                      "src": "1081:18:23",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -1087,10 +1087,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 10181,
+                        "id": 10117,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1081:7:24",
+                        "src": "1081:7:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1100,14 +1100,14 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 10187,
+                  "id": 10123,
                   "initialValue": {
                     "argumentTypes": null,
                     "commonType": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 10186,
+                    "id": 10122,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1116,18 +1116,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 10183,
+                        "id": 10119,
                         "name": "_input",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10175,
-                        "src": "1102:6:24",
+                        "referencedDeclaration": 10111,
+                        "src": "1102:6:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
                         }
                       },
-                      "id": 10184,
+                      "id": 10120,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -1135,7 +1135,7 @@
                       "memberName": "length",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1102:13:24",
+                      "src": "1102:13:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -1146,14 +1146,14 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "3332",
-                      "id": 10185,
+                      "id": 10121,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1118:2:24",
+                      "src": "1118:2:23",
                       "subdenomination": null,
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_32_by_1",
@@ -1161,14 +1161,14 @@
                       },
                       "value": "32"
                     },
-                    "src": "1102:18:24",
+                    "src": "1102:18:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1081:39:24"
+                  "src": "1081:39:23"
                 },
                 {
                   "expression": {
@@ -1180,7 +1180,7 @@
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         },
-                        "id": 10194,
+                        "id": 10130,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1189,18 +1189,18 @@
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 10189,
+                            "id": 10125,
                             "name": "_input",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 10175,
-                            "src": "1138:6:24",
+                            "referencedDeclaration": 10111,
+                            "src": "1138:6:23",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes_memory_ptr",
                               "typeString": "bytes memory"
                             }
                           },
-                          "id": 10190,
+                          "id": 10126,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1208,7 +1208,7 @@
                           "memberName": "length",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "1138:13:24",
+                          "src": "1138:13:23",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
@@ -1222,19 +1222,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 10193,
+                          "id": 10129,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 10191,
+                            "id": 10127,
                             "name": "intsLength",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 10182,
-                            "src": "1155:10:24",
+                            "referencedDeclaration": 10118,
+                            "src": "1155:10:23",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -1245,14 +1245,14 @@
                           "rightExpression": {
                             "argumentTypes": null,
                             "hexValue": "3332",
-                            "id": 10192,
+                            "id": 10128,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "kind": "number",
                             "lValueRequested": false,
                             "nodeType": "Literal",
-                            "src": "1168:2:24",
+                            "src": "1168:2:23",
                             "subdenomination": null,
                             "typeDescriptions": {
                               "typeIdentifier": "t_rational_32_by_1",
@@ -1260,13 +1260,13 @@
                             },
                             "value": "32"
                           },
-                          "src": "1155:15:24",
+                          "src": "1155:15:23",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           }
                         },
-                        "src": "1138:32:24",
+                        "src": "1138:32:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -1274,12 +1274,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 10195,
+                        "id": 10131,
                         "name": "ERROR_IMPROPER_LENGTH",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10156,
-                        "src": "1172:21:24",
+                        "referencedDeclaration": 10092,
+                        "src": "1172:21:23",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory",
                           "typeString": "string memory"
@@ -1297,21 +1297,21 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 10188,
+                      "id": 10124,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        13951,
-                        13952
+                        13887,
+                        13888
                       ],
-                      "referencedDeclaration": 13952,
-                      "src": "1130:7:24",
+                      "referencedDeclaration": 13888,
+                      "src": "1130:7:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 10196,
+                    "id": 10132,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1319,64 +1319,64 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1130:64:24",
+                    "src": "1130:64:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 10197,
+                  "id": 10133,
                   "nodeType": "ExpressionStatement",
-                  "src": "1130:64:24"
+                  "src": "1130:64:23"
                 },
                 {
                   "externalReferences": [
                     {
                       "_input": {
-                        "declaration": 10175,
+                        "declaration": 10111,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1238:6:24",
+                        "src": "1238:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10179,
+                        "declaration": 10115,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1228:6:24",
+                        "src": "1228:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "output": {
-                        "declaration": 10179,
+                        "declaration": 10115,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1264:6:24",
+                        "src": "1264:6:23",
                         "valueSize": 1
                       }
                     },
                     {
                       "intsLength": {
-                        "declaration": 10182,
+                        "declaration": 10118,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "1272:10:24",
+                        "src": "1272:10:23",
                         "valueSize": 1
                       }
                     }
                   ],
-                  "id": 10198,
+                  "id": 10134,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    output := _input\n    mstore(output, intsLength)\n}",
-                  "src": "1205:94:24"
+                  "src": "1205:94:23"
                 }
               ]
             },
             "documentation": null,
-            "id": 10200,
+            "id": 10136,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1384,16 +1384,16 @@
             "name": "dangerouslyCastBytesToUintArray",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 10176,
+              "id": 10112,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10175,
+                  "id": 10111,
                   "name": "_input",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10200,
-                  "src": "728:19:24",
+                  "scope": 10136,
+                  "src": "728:19:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1401,10 +1401,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 10174,
+                    "id": 10110,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "728:5:24",
+                    "src": "728:5:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -1414,20 +1414,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "727:21:24"
+              "src": "727:21:23"
             },
             "payable": false,
             "returnParameters": {
-              "id": 10180,
+              "id": 10116,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10179,
+                  "id": 10115,
                   "name": "output",
                   "nodeType": "VariableDeclaration",
-                  "scope": 10200,
-                  "src": "772:23:24",
+                  "scope": 10136,
+                  "src": "772:23:23",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1436,19 +1436,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 10177,
+                      "id": 10113,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "772:7:24",
+                      "src": "772:7:23",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 10178,
+                    "id": 10114,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "772:9:24",
+                    "src": "772:9:23",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[]"
@@ -1458,20 +1458,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "771:25:24"
+              "src": "771:25:23"
             },
-            "scope": 10201,
-            "src": "687:612:24",
+            "scope": 10137,
+            "src": "687:612:23",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 10202,
-        "src": "27:1274:24"
+        "scope": 10138,
+        "src": "27:1274:23"
       }
     ],
-    "src": "0:1302:24"
+    "src": "0:1302:23"
   },
   "compiler": {
     "name": "solc",
@@ -1479,5 +1479,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2019-04-22T19:37:14.352Z"
+  "updatedAt": "2019-04-23T00:32:27.911Z"
 }

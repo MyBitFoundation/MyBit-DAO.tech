@@ -54,16 +54,13 @@ contract TemplateBase is APMNamehash {
 
 contract MyBitTemplate is TemplateBase {
     MiniMeTokenFactory tokenFactory;
-
-    uint64 constant PCT = 10 ** 16;
-    //address constant ANY_ENTITY = address(-1);
-    //uint64 constant PERIOD = 2592000; //30 days
-
-    uint256 constant TOKEN_SUPPLY = 10**30;
-    //address constant myb = address(0x5d60d8d7eF6d37E16EBABc324de3bE57f135e0BC);
-    //address constant tokensale = address(0xCcA36039cfDd0753D3aA9F1B4Bf35b606c8Ed971);
     address myb;
     address tokensale;
+    //address constant myb = address(0x5d60d8d7eF6d37E16EBABc324de3bE57f135e0BC);
+    //address constant tokensale = address(0xCcA36039cfDd0753D3aA9F1B4Bf35b606c8Ed971);
+
+    uint64 constant PCT = 10 ** 16;
+
     //address[] constant whitelist = [address(0x06134Ad890B6eDb42Bc0487c4e8dBbc17e3E0326)];
     address constant whitelist = address(0xb4124cEB3451635DAcedd11767f004d8a28c6eE7);
     string constant hashlist = 'QmanPRXCzxXXfizjnWr7Fe5x57GH4gBTrFN9nUY1vVdLCV';
@@ -81,24 +78,23 @@ contract MyBitTemplate is TemplateBase {
         Kernel dao = fac.newDAO(this);
         ACL acl = ACL(dao.acl());
         acl.createPermission(this, dao, dao.APP_MANAGER_ROLE(), this);
-        (Voting voting1, Voting voting2, Vault vault, Finance finance) = setupAragonApps(dao);
+        (Voting voting, Vault vault, Finance finance) = setupAragonApps(dao);
         (MyTokens myTokens, MyID myID, MiniMeToken token) = setupMyBitApps(dao);
-        initializeApps(voting1, voting2, vault, finance, token, myTokens, myID);
-        setupPermissions(dao, acl, voting1, voting2, myTokens, vault, finance, myID, msg.sender);
+        initializeApps(voting, vault, finance, token, myTokens, myID);
+        setupPermissions(dao, acl, voting, myTokens, vault, finance, myID, msg.sender);
         emit DeployInstance(dao);
     }
 
-    function setupAragonApps(Kernel _dao) internal returns (Voting voting1, Voting voting2, Vault vault, Finance finance){
+    function setupAragonApps(Kernel _dao) internal returns (Voting voting, Vault vault, Finance finance){
       bytes32 votingAppId = apmNamehash("voting");
       bytes32 vaultAppId = apmNamehash("vault");
       bytes32 financeAppId = apmNamehash("finance");
 
       vault = Vault(_dao.newAppInstance(vaultAppId, latestVersionAppBase(vaultAppId), '', true));
       finance = Finance(_dao.newAppInstance(financeAppId, latestVersionAppBase(financeAppId)));
-      voting1 = Voting(_dao.newAppInstance(votingAppId, latestVersionAppBase(votingAppId)));
-      voting2 = Voting(_dao.newAppInstance(votingAppId, latestVersionAppBase(votingAppId)));
+      voting = Voting(_dao.newAppInstance(votingAppId, latestVersionAppBase(votingAppId)));
 
-      return (voting1, voting2, vault, finance);
+      return (voting, vault, finance);
     }
 
     function setupMyBitApps(Kernel _dao) internal returns (MyTokens myTokens, MyID myID, MiniMeToken token){
@@ -117,33 +113,31 @@ contract MyBitTemplate is TemplateBase {
       //_acl.createPermission(this, myTokens, myTokens.LOCK_ROLE(), this);
       //myTokens.mint(_root, 1); // Give one token to _root
 
-      //setupPermissions(_dao, _acl, voting1, voting2, myTokens, vault, finance, myID, root);
+      //setupPermissions(_dao, _acl, voting, myTokens, vault, finance, myID, root);
       return (myTokens, myID, token);
     }
 
-    function initializeApps(Voting _voting1, Voting _voting2, Vault _vault, Finance _finance, MiniMeToken _token, MyTokens _myTokens, MyID _myID) internal{
+    function initializeApps(Voting _voting, Vault _vault, Finance _finance, MiniMeToken _token, MyTokens _myTokens, MyID _myID) internal{
       // Initialize apps
-      //vault.initialize();
+      _vault.initialize();
       _finance.initialize(_vault, 30 days);
       _myTokens.initialize(_token, myb, tokensale, address(_myID), lockAmounts, lockIntervals, tokenIntervals);
-      _voting1.initialize(_token, (50 * PCT)+1, 20 * PCT, 14 days);
-      _voting2.initialize(_token, 67 * PCT, 5 * PCT, 5 days);
-      _myID.initialize(address(_token), address(_voting2), whitelist, hashlist);
+      _voting.initialize(_token, (50 * PCT)+1, 20 * PCT, 14 days);
+      _myID.initialize(address(_token), address(_voting), whitelist, hashlist);
     }
 
-    function setupPermissions(Kernel _dao, ACL _acl, Voting _voting1, Voting _voting2, MyTokens _myTokens, Vault _vault, Finance _finance, MyID _myID, address _root) internal{
-      _acl.createPermission(_myTokens, _voting1, _voting1.CREATE_VOTES_ROLE(), _voting1);
-      _acl.createPermission(_myTokens, _voting2, _voting2.CREATE_VOTES_ROLE(), _voting2);
+    function setupPermissions(Kernel _dao, ACL _acl, Voting _voting, MyTokens _myTokens, Vault _vault, Finance _finance, MyID _myID, address _root) internal{
+      _acl.createPermission(_myTokens, _voting, _voting.CREATE_VOTES_ROLE(), _voting);
 
-      _acl.createPermission(_voting2, _myID, _myID.AUTHORIZE_ROLE(), _voting1);
-      _acl.createPermission(_voting1, _myTokens, _myTokens.BURN_ROLE(), _voting1);
-      _acl.createPermission(_voting1, _myTokens, _myTokens.MANAGER_ROLE(), _voting1);
-      //_acl.createPermission(_voting1, _vault, _vault.TRANSFER_ROLE(), _voting1);
+      _acl.createPermission(_voting, _myID, _myID.AUTHORIZE_ROLE(), _voting);
+      _acl.createPermission(_voting, _myTokens, _myTokens.BURN_ROLE(), _voting);
+      _acl.createPermission(_voting, _myTokens, _myTokens.MANAGER_ROLE(), _voting);
+      //_acl.createPermission(_voting, _vault, _vault.TRANSFER_ROLE(), _voting);
 
-      _acl.createPermission(_finance, _vault, _vault.TRANSFER_ROLE(), _voting1);
-      _acl.createPermission(_voting1, _finance, _finance.CREATE_PAYMENTS_ROLE(), _voting1);
-      _acl.createPermission(_voting1, _finance, _finance.EXECUTE_PAYMENTS_ROLE(), _voting1);
-      _acl.createPermission(_voting1, _finance, _finance.MANAGE_PAYMENTS_ROLE(), _voting1);
+      _acl.createPermission(_finance, _vault, _vault.TRANSFER_ROLE(), _voting);
+      _acl.createPermission(_voting, _finance, _finance.CREATE_PAYMENTS_ROLE(), _voting);
+      _acl.createPermission(_voting, _finance, _finance.EXECUTE_PAYMENTS_ROLE(), _voting);
+      _acl.createPermission(_voting, _finance, _finance.MANAGE_PAYMENTS_ROLE(), _voting);
 
       // Clean up permissions
       _acl.grantPermission(_root, _dao, _dao.APP_MANAGER_ROLE());

@@ -31,21 +31,21 @@
     "absolutePath": "/home/peter/Documents/Work/MyBit/MyBit-DAO.tech/contracts/WhitelistInterface.sol",
     "exportedSymbols": {
       "WhitelistInterface": [
-        3083
+        3019
       ]
     },
-    "id": 3084,
+    "id": 3020,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3075,
+        "id": 3011,
         "literals": [
           "solidity",
           "0.4",
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:6"
+        "src": "0:23:5"
       },
       {
         "baseContracts": [],
@@ -53,9 +53,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 3083,
+        "id": 3019,
         "linearizedBaseContracts": [
-          3083
+          3019
         ],
         "name": "WhitelistInterface",
         "nodeType": "ContractDefinition",
@@ -63,7 +63,7 @@
           {
             "body": null,
             "documentation": null,
-            "id": 3082,
+            "id": 3018,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -71,16 +71,16 @@
             "name": "checkWhitelist",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3078,
+              "id": 3014,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3077,
+                  "id": 3013,
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3082,
-                  "src": "82:13:6",
+                  "scope": 3018,
+                  "src": "82:13:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -88,10 +88,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3076,
+                    "id": 3012,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "82:7:6",
+                    "src": "82:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -101,20 +101,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "81:15:6"
+              "src": "81:15:5"
             },
             "payable": false,
             "returnParameters": {
-              "id": 3081,
+              "id": 3017,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3080,
+                  "id": 3016,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3082,
-                  "src": "120:4:6",
+                  "scope": 3018,
+                  "src": "120:4:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -122,10 +122,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 3079,
+                    "id": 3015,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "120:4:6",
+                    "src": "120:4:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -135,40 +135,40 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "119:6:6"
+              "src": "119:6:5"
             },
-            "scope": 3083,
-            "src": "58:68:6",
+            "scope": 3019,
+            "src": "58:68:5",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 3084,
-        "src": "25:103:6"
+        "scope": 3020,
+        "src": "25:103:5"
       }
     ],
-    "src": "0:129:6"
+    "src": "0:129:5"
   },
   "legacyAST": {
     "absolutePath": "/home/peter/Documents/Work/MyBit/MyBit-DAO.tech/contracts/WhitelistInterface.sol",
     "exportedSymbols": {
       "WhitelistInterface": [
-        3083
+        3019
       ]
     },
-    "id": 3084,
+    "id": 3020,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3075,
+        "id": 3011,
         "literals": [
           "solidity",
           "0.4",
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:6"
+        "src": "0:23:5"
       },
       {
         "baseContracts": [],
@@ -176,9 +176,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 3083,
+        "id": 3019,
         "linearizedBaseContracts": [
-          3083
+          3019
         ],
         "name": "WhitelistInterface",
         "nodeType": "ContractDefinition",
@@ -186,7 +186,7 @@
           {
             "body": null,
             "documentation": null,
-            "id": 3082,
+            "id": 3018,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -194,16 +194,16 @@
             "name": "checkWhitelist",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3078,
+              "id": 3014,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3077,
+                  "id": 3013,
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3082,
-                  "src": "82:13:6",
+                  "scope": 3018,
+                  "src": "82:13:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -211,10 +211,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3076,
+                    "id": 3012,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "82:7:6",
+                    "src": "82:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -224,20 +224,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "81:15:6"
+              "src": "81:15:5"
             },
             "payable": false,
             "returnParameters": {
-              "id": 3081,
+              "id": 3017,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3080,
+                  "id": 3016,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3082,
-                  "src": "120:4:6",
+                  "scope": 3018,
+                  "src": "120:4:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -245,10 +245,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 3079,
+                    "id": 3015,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "120:4:6",
+                    "src": "120:4:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -258,20 +258,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "119:6:6"
+              "src": "119:6:5"
             },
-            "scope": 3083,
-            "src": "58:68:6",
+            "scope": 3019,
+            "src": "58:68:5",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 3084,
-        "src": "25:103:6"
+        "scope": 3020,
+        "src": "25:103:5"
       }
     ],
-    "src": "0:129:6"
+    "src": "0:129:5"
   },
   "compiler": {
     "name": "solc",
@@ -279,5 +279,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2019-04-22T19:37:14.288Z"
+  "updatedAt": "2019-04-23T00:32:27.706Z"
 }

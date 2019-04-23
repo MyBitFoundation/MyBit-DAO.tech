@@ -1,11 +1,11 @@
 # MyBit Tokens Aragon App
 ## Rinkeby Deployment
-###mybit-tokens.open.aragonpm.eth v6.0.1:
+### mybit-tokens.open.aragonpm.eth v6.0.1:
  - Contract address: 0x9e30C203E106E6c07cC47E4bfED1252f44cb5516
  - Content (ipfs): QmUUuZQVmjkSz4EbHATo6pDatmjMJB4RecV9B3aFoeK6u8
  - Transaction hash: 0xc6f64624a850068e187e1381507b301bf54497346f910c3efe4eb7c495598514
 
-###mybit-tokens.open.aragonpm.eth v6.0.0:
+### mybit-tokens.open.aragonpm.eth v6.0.0:
  - Contract address: 0x9e30C203E106E6c07cC47E4bfED1252f44cb5516
  - Content (ipfs): QmXdd39rTr8Bt5kdaZwPFD1JLJ4Lmktkxn8CG7ZHofxcdN
  - Transaction hash: 0x6646421de7eecb5e53ccbe5cec1bf2754d233fa155d40a264c0fb876af98aa24
