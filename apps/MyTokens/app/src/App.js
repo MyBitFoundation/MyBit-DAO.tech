@@ -1,5 +1,5 @@
 import React from 'react'
-import { getProfile } from '3box'
+//import { getProfile } from '3box'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import BN from 'bn.js'
@@ -45,7 +45,7 @@ class App extends React.Component {
   }
   state = {
     users: {},
-    queried: {},
+    //queried: {},
     erc20Processing: false,
     erc20Loaded: false,
     erc20Symbol: 'ERC20',
@@ -75,6 +75,7 @@ class App extends React.Component {
         erc20Loaded:true
       })
     }
+    /* REMOVED BECAUSE 3BOX CAUSES ERRORS IN FIREFOX
     if(holders){
       let userDict = this.state.users
       let queriedDict = this.state.queried
@@ -102,6 +103,7 @@ class App extends React.Component {
       this.setState({users: userDict})
       this.setState({queried: queriedDict})
     }
+    */
   }
 
   updateDimensions() {
@@ -376,23 +378,13 @@ class App extends React.Component {
                     </Title>
                   }
                   endContent={
-                    <span>
-                      {this.isClaimable(userAccount) && (
-                        <Button
-                          mode="outline"
-                          onClick={this.handleLaunchClaimToken}
-                        >
-                          Claim Token
-                        </Button>
-                      )}
-                      <Button
-                        style={{'marginLeft':'10px'}}
-                        mode="strong"
-                        onClick={this.handleLaunchLockTokensNoHolder}
-                      >
-                        Lock {erc20Symbol}
-                      </Button>
-                    </span>
+                    <Button
+                      style={{'marginLeft':'10px'}}
+                      mode="strong"
+                      onClick={this.handleLaunchLockTokensNoHolder}
+                    >
+                      Lock {erc20Symbol}
+                    </Button>
                   }
                 />
               }

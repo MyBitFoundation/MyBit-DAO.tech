@@ -39,29 +39,14 @@ const retryEvery = (callback, initialRetryTimer = 1000, increaseFactor = 5) => {
 
 // Get the token address to initialize ourselves
 retryEvery(retry => {
-  let tokenAddress, tokensaleAddress
+  let tokenAddress
 
   app
     .call('token')
     .first()
     .subscribe(
       function(result) {
-        tokenAddress = result
-        app
-          .call('tokensale')
-          .first()
-          .subscribe(
-            function(result){
-              tokensaleAddress = result
-              initialize(tokenAddress, tokensaleAddress)
-            }
-            , err => {
-            console.error(
-              'Could not start background script execution due to the contract not loading the tokensale:',
-              err
-            )
-            retry()
-          })
+        initialize(result)
       }
       , err => {
       console.error(
@@ -72,9 +57,8 @@ retryEvery(retry => {
     })
 })
 
-async function initialize(tokenAddr, tokensaleAddr) {
+async function initialize(tokenAddr) {
   const token = app.external(tokenAddr, tokenAbi)
-  const tokensale = app.external(tokensaleAddr, tokensaleAbi)
   try {
     const tokenSymbol = await loadTokenSymbol(token)
     app.identify(tokenSymbol);
@@ -85,7 +69,7 @@ async function initialize(tokenAddr, tokensaleAddr) {
     )
   }
 
-  return createStore(token, tokenAddr, tokensale, tokensaleAddr)
+  return createStore(token, tokenAddr)
 }
 
 // Hook up the script as an aragon.js store
@@ -104,7 +88,6 @@ async function createStore(token, tokenAddr, tokensale, tokensaleAddr) {
           ...nextState,
           holders: [],
           tokenAddress: tokenAddr,
-          tokensaleAddress: tokensaleAddr,
           erc20Address: await loadERC20(),
           claimAmount: await loadClaimAmount(),
         }
@@ -227,7 +210,7 @@ function updateHolderState(state, changes) {
     holders: updateHolders(holders, changes),
   }
 }
-
+/*
 function updateContributorState(state, changes) {
   const { holders = [] } = state
   return {
@@ -235,7 +218,7 @@ function updateContributorState(state, changes) {
     holders: updateContributors(holders, changes)
   }
 }
-
+*/
 function updateClaimedState(state, changes) {
   const { holders = [] } = state
   return {
@@ -267,7 +250,7 @@ function updateHolders(holders, changed) {
   }
   return holders
 }
-
+/*
 function updateContributors(holders, changed) {
   const contributorIndex = holders.findIndex(contributor =>
     addressesEqual(contributor.address, changed.address)
@@ -283,7 +266,7 @@ function updateContributors(holders, changed) {
   }
   return holders
 }
-
+*/
 function updateClaims(holders, changed) {
   const claimantIndex = holders.findIndex(claimant =>
     addressesEqual(claimant.address, changed.address)

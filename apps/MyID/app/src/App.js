@@ -1,5 +1,5 @@
 import React from 'react'
-import Box from '3box'
+//import { getProfile } from '3box'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import BN from 'bn.js'
@@ -39,7 +39,7 @@ class App extends React.Component {
   }
   state = {
     users: {},
-    queried: {},
+    //queried: {},
     sidepanelOpened: false,
     token: null,
   }
@@ -52,6 +52,7 @@ class App extends React.Component {
         token,
       })
     }
+    /*
     if(users){
       let userDict = this.state.users
       let queriedDict = this.state.queried
@@ -64,7 +65,7 @@ class App extends React.Component {
         userDict[user] = user
         this.setState({users: userDict})
         this.setState({queried: queriedDict})
-        promiseArray.push(Box.getProfile(user))
+        promiseArray.push(getProfile(user))
         userArray.push(user)
       })
       const profiles = await Promise.all(promiseArray)
@@ -79,6 +80,7 @@ class App extends React.Component {
       this.setState({users: userDict})
       this.setState({queried: queriedDict})
     }
+    */
   }
 
   getBalance = (userAccount) => {

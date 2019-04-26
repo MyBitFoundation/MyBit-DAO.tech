@@ -1,5 +1,9 @@
 # MyTokens
 ## Mainnet Deployment
+### mytokens.open.aragonpm.eth v1.0.4:
+ - Content (ipfs): QmbUvMdpLFpF8McKXrBFAbzUuBzGPD3RtDmEJ5FmXJgn1m
+ - Transaction hash: 0x0abc91c4418c141e88bba414ced578308527ea400d14b0593b1ef58611e2ca52
+
 ### mytokens.open.aragonpm.eth v1.0.3:
  - Content (ipfs): QmT3E4WuizwLJd8XnmwvuR75n2jqiRKgKzq6uiY4jck9zD
  - Transaction hash: 0xb930610d53f0ef3a6cff7c08580df9f29d5e2c4e53f1556163c325cb91e307be

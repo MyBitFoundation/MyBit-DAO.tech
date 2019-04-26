@@ -100,7 +100,7 @@ class UserCard extends React.Component {
         )}
         <UserContent>
           <Owner>
-            <span>{user}</span>
+            <span>{user ? user : address}</span>
             {isCurrentUser && (
               <Badge.Identity
                 style={{ fontVariant: 'small-caps' }}
@@ -110,7 +110,7 @@ class UserCard extends React.Component {
               </Badge.Identity>
             )}
           </Owner>
-          {address.toLowerCase() != user.toLowerCase() && (
+          {user && address.toLowerCase() != user.toLowerCase() && (
             <Subheader>{address}</Subheader>
           )}
           {socialData && socialData.website && socialData.website != '' && (
