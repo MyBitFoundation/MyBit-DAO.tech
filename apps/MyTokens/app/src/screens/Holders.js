@@ -32,6 +32,7 @@ class Holders extends React.Component {
   render() {
     const {
       holders,
+      users,
       maxAccountTokens,
       claimAmount,
       onLockTokens,
@@ -75,20 +76,18 @@ class Holders extends React.Component {
                    header={
                      <TableRow>
                        <TableHeader title='Holder' />
-                       <TableHeader title='Contributed'  align="right"/>
                        <TableHeader title="Balance" align="right" />
                        <TableHeader title="" />
                      </TableRow>
                    }
                    noSideBorders={compactTable}
                  >
-                   {holders.map(({ address, balance, contribution, claimed, name }) => (
+                   {holders.map(({ address, balance, contribution, claimed }) => (
                      <HolderRow
                        key={address}
                        address={address}
-                       name={name}
+                       name={users[address]}
                        balance={balance}
-                       contribution={contribution}
                        claimed={claimed}
                        claimAmount={claimAmount}
                        isCurrentUser={userAccount && userAccount === address}

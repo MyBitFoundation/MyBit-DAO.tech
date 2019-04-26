@@ -147,7 +147,7 @@ class UserCard extends React.Component {
 const Card = styled.div`
   display: flex;
   flex-direction: column;
-  height: 350px;
+  height: 500px;
   background: #ffffff;
   border: 1px solid rgba(209, 209, 209, 0.5);
   border-radius: 3px;
@@ -157,7 +157,7 @@ const Card = styled.div`
 const Pic = styled.img`
   object-fit: cover;
   width:100%;
-  height: 275px;
+  height: 425px;
   position:absolute;
   top:0;
 `

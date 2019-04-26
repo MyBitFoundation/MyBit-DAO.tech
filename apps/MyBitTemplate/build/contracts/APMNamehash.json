@@ -3,22 +3,22 @@
   "abi": [],
   "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3006080604052600080fd00a165627a7a7230582079a6dd6da08ec746edb60625cdee4ff6fe5e216f7057756a649e5c3a3972860a0029",
   "deployedBytecode": "0x6080604052600080fd00a165627a7a7230582079a6dd6da08ec746edb60625cdee4ff6fe5e216f7057756a649e5c3a3972860a0029",
-  "sourceMap": "71:461:15:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;71:461:15;;;;;;;",
-  "deployedSourceMap": "71:461:15:-;;;;;",
+  "sourceMap": "71:461:1:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;71:461:1;;;;;;;",
+  "deployedSourceMap": "71:461:1:-;;;;;",
   "source": "/*\n * SPDX-License-Identitifer:    MIT\n */\n\npragma solidity ^0.4.24;\n\n\ncontract APMNamehash {\n    /* Hardcoded constants to save gas\n    bytes32 internal constant APM_NODE = keccak256(abi.encodePacked(ETH_TLD_NODE, keccak256(abi.encodePacked(\"aragonpm\"))));\n    */\n    bytes32 internal constant APM_NODE = 0x9065c3e7f7b7ef1ef4e53d2d0b8e0cef02874ab020c1ece79d5f0d3d0111c0ba;\n\n    function apmNamehash(string name) internal pure returns (bytes32) {\n        return keccak256(abi.encodePacked(APM_NODE, keccak256(bytes(name))));\n    }\n}\n",
   "sourcePath": "@aragon/os/contracts/apm/APMNamehash.sol",
   "ast": {
     "absolutePath": "@aragon/os/contracts/apm/APMNamehash.sol",
     "exportedSymbols": {
       "APMNamehash": [
-        9301
+        931
       ]
     },
-    "id": 9302,
+    "id": 932,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9277,
+        "id": 907,
         "literals": [
           "solidity",
           "^",
@@ -26,7 +26,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "44:24:15"
+        "src": "44:24:1"
       },
       {
         "baseContracts": [],
@@ -34,20 +34,20 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 9301,
+        "id": 931,
         "linearizedBaseContracts": [
-          9301
+          931
         ],
         "name": "APMNamehash",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 9280,
+            "id": 910,
             "name": "APM_NODE",
             "nodeType": "VariableDeclaration",
-            "scope": 9301,
-            "src": "269:103:15",
+            "scope": 931,
+            "src": "269:103:1",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -55,10 +55,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 9278,
+              "id": 908,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "269:7:15",
+              "src": "269:7:1",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -67,14 +67,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "307839303635633365376637623765663165663465353364326430623865306365663032383734616230323063316563653739643566306433643031313163306261",
-              "id": 9279,
+              "id": 909,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "306:66:15",
+              "src": "306:66:1",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_65312853843906083142924454034138414288605577640028287111178798186601638903994_by_1",
@@ -86,9 +86,9 @@
           },
           {
             "body": {
-              "id": 9299,
+              "id": 929,
               "nodeType": "Block",
-              "src": "445:85:15",
+              "src": "445:85:1",
               "statements": [
                 {
                   "expression": {
@@ -99,12 +99,12 @@
                         "arguments": [
                           {
                             "argumentTypes": null,
-                            "id": 9290,
+                            "id": 920,
                             "name": "APM_NODE",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 9280,
-                            "src": "489:8:15",
+                            "referencedDeclaration": 910,
+                            "src": "489:8:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
@@ -118,12 +118,12 @@
                                 "arguments": [
                                   {
                                     "argumentTypes": null,
-                                    "id": 9293,
+                                    "id": 923,
                                     "name": "name",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
-                                    "referencedDeclaration": 9282,
-                                    "src": "515:4:15",
+                                    "referencedDeclaration": 912,
+                                    "src": "515:4:1",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_memory_ptr",
                                       "typeString": "string memory"
@@ -137,20 +137,20 @@
                                       "typeString": "string memory"
                                     }
                                   ],
-                                  "id": 9292,
+                                  "id": 922,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "509:5:15",
+                                  "src": "509:5:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": "bytes"
                                 },
-                                "id": 9294,
+                                "id": 924,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -158,7 +158,7 @@
                                 "lValueRequested": false,
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "509:11:15",
+                                "src": "509:11:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_memory",
                                   "typeString": "bytes memory"
@@ -172,18 +172,18 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "id": 9291,
+                              "id": 921,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13878,
-                              "src": "499:9:15",
+                              "referencedDeclaration": 1039,
+                              "src": "499:9:1",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
                                 "typeString": "function () pure returns (bytes32)"
                               }
                             },
-                            "id": 9295,
+                            "id": 925,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -191,7 +191,7 @@
                             "lValueRequested": false,
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "499:22:15",
+                            "src": "499:22:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
@@ -211,18 +211,18 @@
                           ],
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9288,
+                            "id": 918,
                             "name": "abi",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 13871,
-                            "src": "472:3:15",
+                            "referencedDeclaration": 1032,
+                            "src": "472:3:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_abi",
                               "typeString": "abi"
                             }
                           },
-                          "id": 9289,
+                          "id": 919,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -230,13 +230,13 @@
                           "memberName": "encodePacked",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "472:16:15",
+                          "src": "472:16:1",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_abiencodepacked_pure$__$returns$_t_bytes_memory_ptr_$",
                             "typeString": "function () pure returns (bytes memory)"
                           }
                         },
-                        "id": 9296,
+                        "id": 926,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -244,7 +244,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "472:50:15",
+                        "src": "472:50:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
@@ -258,18 +258,18 @@
                           "typeString": "bytes memory"
                         }
                       ],
-                      "id": 9287,
+                      "id": 917,
                       "name": "keccak256",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 13878,
-                      "src": "462:9:15",
+                      "referencedDeclaration": 1039,
+                      "src": "462:9:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
                         "typeString": "function () pure returns (bytes32)"
                       }
                     },
-                    "id": 9297,
+                    "id": 927,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -277,21 +277,21 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "462:61:15",
+                    "src": "462:61:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
                     }
                   },
-                  "functionReturnParameters": 9286,
-                  "id": 9298,
+                  "functionReturnParameters": 916,
+                  "id": 928,
                   "nodeType": "Return",
-                  "src": "455:68:15"
+                  "src": "455:68:1"
                 }
               ]
             },
             "documentation": null,
-            "id": 9300,
+            "id": 930,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -299,16 +299,16 @@
             "name": "apmNamehash",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 9283,
+              "id": 913,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9282,
+                  "id": 912,
                   "name": "name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9300,
-                  "src": "400:11:15",
+                  "scope": 930,
+                  "src": "400:11:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -316,10 +316,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9281,
+                    "id": 911,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "400:6:15",
+                    "src": "400:6:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -329,20 +329,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "399:13:15"
+              "src": "399:13:1"
             },
             "payable": false,
             "returnParameters": {
-              "id": 9286,
+              "id": 916,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9285,
+                  "id": 915,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9300,
-                  "src": "436:7:15",
+                  "scope": 930,
+                  "src": "436:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -350,10 +350,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 9284,
+                    "id": 914,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "436:7:15",
+                    "src": "436:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -363,33 +363,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "435:9:15"
+              "src": "435:9:1"
             },
-            "scope": 9301,
-            "src": "379:151:15",
+            "scope": 931,
+            "src": "379:151:1",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 9302,
-        "src": "71:461:15"
+        "scope": 932,
+        "src": "71:461:1"
       }
     ],
-    "src": "44:489:15"
+    "src": "44:489:1"
   },
   "legacyAST": {
     "absolutePath": "@aragon/os/contracts/apm/APMNamehash.sol",
     "exportedSymbols": {
       "APMNamehash": [
-        9301
+        931
       ]
     },
-    "id": 9302,
+    "id": 932,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9277,
+        "id": 907,
         "literals": [
           "solidity",
           "^",
@@ -397,7 +397,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "44:24:15"
+        "src": "44:24:1"
       },
       {
         "baseContracts": [],
@@ -405,20 +405,20 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 9301,
+        "id": 931,
         "linearizedBaseContracts": [
-          9301
+          931
         ],
         "name": "APMNamehash",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 9280,
+            "id": 910,
             "name": "APM_NODE",
             "nodeType": "VariableDeclaration",
-            "scope": 9301,
-            "src": "269:103:15",
+            "scope": 931,
+            "src": "269:103:1",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -426,10 +426,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 9278,
+              "id": 908,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "269:7:15",
+              "src": "269:7:1",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -438,14 +438,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "307839303635633365376637623765663165663465353364326430623865306365663032383734616230323063316563653739643566306433643031313163306261",
-              "id": 9279,
+              "id": 909,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "306:66:15",
+              "src": "306:66:1",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_65312853843906083142924454034138414288605577640028287111178798186601638903994_by_1",
@@ -457,9 +457,9 @@
           },
           {
             "body": {
-              "id": 9299,
+              "id": 929,
               "nodeType": "Block",
-              "src": "445:85:15",
+              "src": "445:85:1",
               "statements": [
                 {
                   "expression": {
@@ -470,12 +470,12 @@
                         "arguments": [
                           {
                             "argumentTypes": null,
-                            "id": 9290,
+                            "id": 920,
                             "name": "APM_NODE",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 9280,
-                            "src": "489:8:15",
+                            "referencedDeclaration": 910,
+                            "src": "489:8:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
@@ -489,12 +489,12 @@
                                 "arguments": [
                                   {
                                     "argumentTypes": null,
-                                    "id": 9293,
+                                    "id": 923,
                                     "name": "name",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
-                                    "referencedDeclaration": 9282,
-                                    "src": "515:4:15",
+                                    "referencedDeclaration": 912,
+                                    "src": "515:4:1",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_memory_ptr",
                                       "typeString": "string memory"
@@ -508,20 +508,20 @@
                                       "typeString": "string memory"
                                     }
                                   ],
-                                  "id": 9292,
+                                  "id": 922,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "509:5:15",
+                                  "src": "509:5:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": "bytes"
                                 },
-                                "id": 9294,
+                                "id": 924,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -529,7 +529,7 @@
                                 "lValueRequested": false,
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "509:11:15",
+                                "src": "509:11:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_memory",
                                   "typeString": "bytes memory"
@@ -543,18 +543,18 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "id": 9291,
+                              "id": 921,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13878,
-                              "src": "499:9:15",
+                              "referencedDeclaration": 1039,
+                              "src": "499:9:1",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
                                 "typeString": "function () pure returns (bytes32)"
                               }
                             },
-                            "id": 9295,
+                            "id": 925,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -562,7 +562,7 @@
                             "lValueRequested": false,
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "499:22:15",
+                            "src": "499:22:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
@@ -582,18 +582,18 @@
                           ],
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9288,
+                            "id": 918,
                             "name": "abi",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 13871,
-                            "src": "472:3:15",
+                            "referencedDeclaration": 1032,
+                            "src": "472:3:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_abi",
                               "typeString": "abi"
                             }
                           },
-                          "id": 9289,
+                          "id": 919,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -601,13 +601,13 @@
                           "memberName": "encodePacked",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "472:16:15",
+                          "src": "472:16:1",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_abiencodepacked_pure$__$returns$_t_bytes_memory_ptr_$",
                             "typeString": "function () pure returns (bytes memory)"
                           }
                         },
-                        "id": 9296,
+                        "id": 926,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -615,7 +615,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "472:50:15",
+                        "src": "472:50:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
@@ -629,18 +629,18 @@
                           "typeString": "bytes memory"
                         }
                       ],
-                      "id": 9287,
+                      "id": 917,
                       "name": "keccak256",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 13878,
-                      "src": "462:9:15",
+                      "referencedDeclaration": 1039,
+                      "src": "462:9:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
                         "typeString": "function () pure returns (bytes32)"
                       }
                     },
-                    "id": 9297,
+                    "id": 927,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -648,21 +648,21 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "462:61:15",
+                    "src": "462:61:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
                     }
                   },
-                  "functionReturnParameters": 9286,
-                  "id": 9298,
+                  "functionReturnParameters": 916,
+                  "id": 928,
                   "nodeType": "Return",
-                  "src": "455:68:15"
+                  "src": "455:68:1"
                 }
               ]
             },
             "documentation": null,
-            "id": 9300,
+            "id": 930,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -670,16 +670,16 @@
             "name": "apmNamehash",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 9283,
+              "id": 913,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9282,
+                  "id": 912,
                   "name": "name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9300,
-                  "src": "400:11:15",
+                  "scope": 930,
+                  "src": "400:11:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -687,10 +687,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9281,
+                    "id": 911,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "400:6:15",
+                    "src": "400:6:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -700,20 +700,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "399:13:15"
+              "src": "399:13:1"
             },
             "payable": false,
             "returnParameters": {
-              "id": 9286,
+              "id": 916,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9285,
+                  "id": 915,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9300,
-                  "src": "436:7:15",
+                  "scope": 930,
+                  "src": "436:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -721,10 +721,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 9284,
+                    "id": 914,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "436:7:15",
+                    "src": "436:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -734,20 +734,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "435:9:15"
+              "src": "435:9:1"
             },
-            "scope": 9301,
-            "src": "379:151:15",
+            "scope": 931,
+            "src": "379:151:1",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 9302,
-        "src": "71:461:15"
+        "scope": 932,
+        "src": "71:461:1"
       }
     ],
-    "src": "44:489:15"
+    "src": "44:489:1"
   },
   "compiler": {
     "name": "solc",
@@ -755,5 +755,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2019-04-23T00:32:27.891Z"
+  "updatedAt": "2019-04-24T16:14:39.240Z"
 }

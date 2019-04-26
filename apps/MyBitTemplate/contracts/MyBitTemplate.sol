@@ -10,29 +10,102 @@
 
 pragma solidity 0.4.24;
 
-import "@aragon/os/contracts/factory/DAOFactory.sol";
-import "@aragon/os/contracts/apm/Repo.sol";
-import "@aragon/os/contracts/lib/ens/ENS.sol";
-import "@aragon/os/contracts/lib/ens/PublicResolver.sol";
+//import "@aragon/os/contracts/factory/DAOFactory.sol";
+//import "@aragon/os/contracts/apm/Repo.sol";
+import "@aragon/os/contracts/lib/ens/AbstractENS.sol";
+//import "@aragon/os/contracts/lib/ens/PublicResolver.sol";
 import "@aragon/os/contracts/apm/APMNamehash.sol";
+import "@aragon/os/contracts/lib/misc/ERCProxy.sol";
 
-import "@aragon/apps-voting/contracts/Voting.sol";
-import "@aragon/apps-vault/contracts/Vault.sol";
-import "@aragon/apps-finance/contracts/Finance.sol";
-import "../../MyTokens/contracts/MyTokens.sol";
-import "../../MyID/contracts/MyID.sol";
-import "../../../contracts/StandardToken.sol";
-import "../../../contracts/TokenSale.sol";
+//import "@aragon/apps-voting/contracts/Voting.sol";
+//import "@aragon/apps-vault/contracts/Vault.sol";
+//import "@aragon/apps-finance/contracts/Finance.sol";
+//import "../../MyTokens/contracts/MyTokens.sol";
+//import "../../MyID/contracts/MyID.sol";
+
 import "@aragon/apps-shared-minime/contracts/MiniMeToken.sol";
 
+interface ACL{
+  function createPermission(address _entity, address _app, bytes32 _role, address _manager) external;
+  function grantPermission(address _entity, address _app, bytes32 _role) external;
+  function revokePermission(address _entity, address _app, bytes32 _role) external;
+  function setPermissionManager(address _newManager, address _app, bytes32 _role) external;
+  function CREATE_PERMISSIONS_ROLE() external returns (bytes32);
+}
+
+interface Kernel{
+  function acl() external returns (ACL);
+  function newAppInstance(bytes32 _appId, address _appBase) external returns (ERCProxy appProxy);
+  function newAppInstance(bytes32 _appId, address _appBase, bytes _initializePayload, bool _setDefault) external returns (ERCProxy appProxy);
+  function APP_MANAGER_ROLE() external returns (bytes32);
+}
+interface DAOFactory{
+  function newDAO(address _root) external returns (Kernel);
+}
+
+interface Repo{
+  function getLatest() external returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI);
+}
+
+interface PublicResolver{
+  function addr(bytes32 node) external returns (address ret);
+}
+
+interface Voting{
+  function initialize(MiniMeToken _token, uint64 _supportRequiredPct, uint64 _minAcceptQuorumPct, uint64 _voteTime) external;
+  function CREATE_VOTES_ROLE() external returns (bytes32);
+  function MODIFY_SUPPORT_ROLE() external returns (bytes32);
+  function MODIFY_QUORUM_ROLE() external returns (bytes32);
+}
+
+interface Vault{
+  function initialize() external;
+  function TRANSFER_ROLE() external returns (bytes32);
+}
+
+interface Finance{
+  function initialize(Vault _vault, uint64 _periodDuration) external;
+  function CREATE_PAYMENTS_ROLE() external returns (bytes32);
+  function CHANGE_PERIOD_ROLE() external returns (bytes32);
+  function CHANGE_BUDGETS_ROLE() external returns (bytes32);
+  function EXECUTE_PAYMENTS_ROLE() external returns (bytes32);
+  function MANAGE_PAYMENTS_ROLE() external returns (bytes32);
+}
+
+interface MyID{
+  function initialize(address _token, address _voting, address _founder, string _hash) external;
+  function AUTHORIZE_ROLE() external returns (bytes32);
+}
+
+interface MyTokens{
+  function initialize(MiniMeToken _token, address _erc20, address _tokensale, address _whitelist, uint256[] _lockAmounts, uint256[] _lockIntervals, uint256[] _tokenIntervals) external;
+  function BURN_ROLE() external returns (bytes32);
+  function MANAGER_ROLE() external returns (bytes32);
+}
+/*
+interface MiniMeTokenFactory{
+  function createCloneToken(
+      MiniMeToken _parentToken,
+      uint _snapshotBlock,
+      string _tokenName,
+      uint8 _decimalUnits,
+      string _tokenSymbol,
+      bool _transfersEnabled
+  ) external returns (MiniMeToken);
+}
+
+interface MiniMeToken{
+  function changeController(address _newController) external;
+}
+*/
 contract TemplateBase is APMNamehash {
-    ENS public ens;
+    AbstractENS public ens;
     DAOFactory public fac;
 
     event DeployInstance(address dao);
     event InstalledApp(address appProxy, bytes32 appId);
 
-    constructor(DAOFactory _fac, ENS _ens) {
+    constructor(DAOFactory _fac, AbstractENS _ens) {
         ens = _ens;
 
         // If no factory is passed, get it from on-chain bare-kit
@@ -56,33 +129,29 @@ contract MyBitTemplate is TemplateBase {
     MiniMeTokenFactory tokenFactory;
     address myb;
     address tokensale;
-    //address constant myb = address(0x5d60d8d7eF6d37E16EBABc324de3bE57f135e0BC);
-    //address constant tokensale = address(0xCcA36039cfDd0753D3aA9F1B4Bf35b606c8Ed971);
 
     uint64 constant PCT = 10 ** 16;
-
-    //address[] constant whitelist = [address(0x06134Ad890B6eDb42Bc0487c4e8dBbc17e3E0326)];
-    address constant whitelist = address(0xb4124cEB3451635DAcedd11767f004d8a28c6eE7);
-    string constant hashlist = 'QmanPRXCzxXXfizjnWr7Fe5x57GH4gBTrFN9nUY1vVdLCV';
     uint256[] lockAmounts = [10**18, 10**23, 10**23, 10**23, 10**23];
     uint256[] lockIntervals = [0, 3, 12, 24, 36];
-    uint256[] tokenIntervals = [10, 20, 50, 80, 130];
+    uint256[] tokenIntervals = [10, 15, 50, 80, 130];
 
-    constructor(ENS ens, address _token, address _tokensale) TemplateBase(DAOFactory(0), ens) {
+    constructor(AbstractENS ens, address _token, address _tokensale) TemplateBase(DAOFactory(0), ens) {
         tokenFactory = new MiniMeTokenFactory();
         myb = _token;
         tokensale = _tokensale;
     }
 
     function newInstance() {
-        Kernel dao = fac.newDAO(this);
-        ACL acl = ACL(dao.acl());
-        acl.createPermission(this, dao, dao.APP_MANAGER_ROLE(), this);
-        (Voting voting, Vault vault, Finance finance) = setupAragonApps(dao);
-        (MyTokens myTokens, MyID myID, MiniMeToken token) = setupMyBitApps(dao);
-        initializeApps(voting, vault, finance, token, myTokens, myID);
-        setupPermissions(dao, acl, voting, myTokens, vault, finance, myID, msg.sender);
-        emit DeployInstance(dao);
+      string memory idHash = 'QmRxP22s7mXZicSh1jvQq6s1Vuosye6H887JUXCrc4t3gd';
+      Kernel dao = fac.newDAO(this);
+      ACL acl = ACL(dao.acl());
+      acl.createPermission(this, dao, dao.APP_MANAGER_ROLE(), this);
+      (Voting voting, Vault vault, Finance finance) = setupAragonApps(dao);
+      (MyTokens myTokens, MyID myID, MiniMeToken token) = setupMyBitApps(dao);
+      initializeAragonApps(voting, vault, finance, token);
+      initializeMyBitApps(voting, token, myTokens, myID, msg.sender, idHash);
+      setupPermissions(dao, acl, voting, myTokens, vault, finance, myID, msg.sender);
+      emit DeployInstance(dao);
     }
 
     function setupAragonApps(Kernel _dao) internal returns (Voting voting, Vault vault, Finance finance){
@@ -107,23 +176,21 @@ contract MyBitTemplate is TemplateBase {
       myID = MyID(_dao.newAppInstance(myIDAppId, latestVersionAppBase(myIDAppId)));
 
       token = tokenFactory.createCloneToken(MiniMeToken(0), 0, "MyVote", 1, "MYV", true);
-      //token.generateTokens(msg.sender, 1);
       token.changeController(myTokens);
-
-      //_acl.createPermission(this, myTokens, myTokens.LOCK_ROLE(), this);
-      //myTokens.mint(_root, 1); // Give one token to _root
-
-      //setupPermissions(_dao, _acl, voting, myTokens, vault, finance, myID, root);
       return (myTokens, myID, token);
     }
 
-    function initializeApps(Voting _voting, Vault _vault, Finance _finance, MiniMeToken _token, MyTokens _myTokens, MyID _myID) internal{
+    function initializeAragonApps(Voting _voting, Vault _vault, Finance _finance, MiniMeToken _token) internal{
       // Initialize apps
       _vault.initialize();
       _finance.initialize(_vault, 30 days);
-      _myTokens.initialize(_token, myb, tokensale, address(_myID), lockAmounts, lockIntervals, tokenIntervals);
       _voting.initialize(_token, (50 * PCT)+1, 20 * PCT, 14 days);
-      _myID.initialize(address(_token), address(_voting), whitelist, hashlist);
+    }
+
+    function initializeMyBitApps(Voting _voting, MiniMeToken _token, MyTokens _myTokens, MyID _myID, address _whitelisted, string _hash) internal{
+      // Initialize apps
+      _myTokens.initialize(_token, myb, tokensale, address(_myID), lockAmounts, lockIntervals, tokenIntervals);
+      _myID.initialize(address(_token), address(_voting), _whitelisted, _hash);
     }
 
     function setupPermissions(Kernel _dao, ACL _acl, Voting _voting, MyTokens _myTokens, Vault _vault, Finance _finance, MyID _myID, address _root) internal{

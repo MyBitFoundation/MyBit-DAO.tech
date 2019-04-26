@@ -44,7 +44,8 @@ class App extends React.Component {
     userAccount: '',
   }
   state = {
-    holders: [],
+    users: {},
+    queried: {},
     erc20Processing: false,
     erc20Loaded: false,
     erc20Symbol: 'ERC20',
@@ -75,18 +76,31 @@ class App extends React.Component {
       })
     }
     if(holders){
-      this.setState({holders})
+      let userDict = this.state.users
+      let queriedDict = this.state.queried
       let promiseArray = [];
-      holders.forEach((holder) => {
+      let holderArray = [];
+      holders
+      .filter(({ address }) => !queriedDict[address])
+      .forEach((holder) => {
+        queriedDict[holder.address] = true
+        userDict[holder.address] = holder.address
+        this.setState({users: userDict})
+        this.setState({queried: queriedDict})
         promiseArray.push(getProfile(holder.address))
+        holderArray.push(holder.address)
       })
       const profiles = await Promise.all(promiseArray)
-      for(var i=0; i<holders.length; i++){
-        if(profiles[i].name != undefined && profiles[i].name != ''){
-          holders[i].name = profiles[i].name
+      for(var i=0; i<profiles.length; i++){
+        if(profiles[i].name){
+          const holderIndex = holders.findIndex(holder =>
+            addressesEqual(holder.address, holderArray[i])
+          )
+          if(profiles[i].name != '') userDict[holders[holderIndex].address] = profiles[i].name
         }
       }
-      this.setState({holders})
+      this.setState({users: userDict})
+      this.setState({queried: queriedDict})
     }
   }
 
@@ -199,10 +213,17 @@ class App extends React.Component {
     const holder = holders.find(holder =>
       addressesEqual(holder.address, address)
     )
+    /*
     if (holder && holder.contribution.gt(new BN('0')) && !holder.claimed){
       return true
     } else {
       return false
+    }
+    */
+    if (holder && holder.claimed){
+      return false
+    } else {
+      return true
     }
   }
   handleUpdateTokens = ({ mode, index}) => {
@@ -229,6 +250,7 @@ class App extends React.Component {
 
     this.handleSidepanelClose()
   }
+  /*
   handleClaimToken = () => {
     const {app, holders, userAccount} = this.props
     const holderIndex = holders.findIndex(holder =>
@@ -237,11 +259,35 @@ class App extends React.Component {
     let day = holders[holderIndex].day
     if(day) app.claim(day)
   }
+  */
+  handleClaimToken = day => {
+    const {app} = this.props
+    if(day >= 0 && day < 365){
+      app.claim(day)
+        .subscribe(
+          txHash => {
+            //console.log('Tx: ', txHash)
+            this.handleSidepanelClose()
+          },
+          err => {
+            console.error(err)
+            this.handleSidepanelClose()
+          })
+    }
+  }
   handleBurnTokens = ({ address, message }) => {
     const { app } = this.props
     app.burn(address, message)
-    this.handleSidepanelClose()
-   }
+      .subscribe(
+        txHash => {
+          //console.log('Tx: ', txHash)
+          this.handleSidepanelClose()
+        },
+        err => {
+          console.error(err)
+          this.handleSidepanelClose()
+        })
+  }
   handleLaunchLockTokensNoHolder = () => {
     const { userAccount } = this.props
     this.handleLaunchLockTokens(userAccount)
@@ -255,6 +301,13 @@ class App extends React.Component {
   handleLaunchUnlockTokens = address => {
     this.setState({
       lockTokensConfig: { mode: 'unlock', holderAddress: address },
+      sidepanelOpened: true,
+    })
+  }
+  handleLaunchClaimToken = () => {
+    const {userAccount} = this.props
+    this.setState({
+      lockTokensConfig: { mode: 'claim', holderAddress: userAccount },
       sidepanelOpened: true,
     })
   }
@@ -277,6 +330,7 @@ class App extends React.Component {
   }
   render() {
     const {
+      holders,
       appStateReady,
       erc20Address,
       numData,
@@ -291,7 +345,7 @@ class App extends React.Component {
       claimAmount,
     } = this.props
     const {
-      holders,
+      users,
       erc20Loaded,
       lockTokensConfig,
       sidepanelOpened,
@@ -326,7 +380,7 @@ class App extends React.Component {
                       {this.isClaimable(userAccount) && (
                         <Button
                           mode="outline"
-                          onClick={this.handleClaimToken}
+                          onClick={this.handleLaunchClaimToken}
                         >
                           Claim Token
                         </Button>
@@ -346,6 +400,7 @@ class App extends React.Component {
               {appStateReady && holders.length > 0 ? (
                 <Holders
                   holders={holders}
+                  users={users}
                   tokenAddress={tokenAddress}
                   tokenDecimalsBase={tokenDecimalsBase}
                   ethDecimalsBase={ethDecimalsBase}
@@ -371,7 +426,11 @@ class App extends React.Component {
             title={
               lockTokensConfig.mode === 'lock'
                 ? `Lock ${erc20Symbol}`
-                : `Unlock ${erc20Symbol}`
+                : (lockTokensConfig.mode === 'unlock'
+                ? `Unlock ${erc20Symbol}`
+                : (lockTokensConfig.mode === 'burn'
+                ? 'Burn Tokens'
+                : 'Claim Token'))
             }
             opened={sidepanelOpened}
             onClose={this.handleSidepanelClose}
@@ -388,6 +447,7 @@ class App extends React.Component {
                 erc20Symbol={erc20Symbol}
                 onUpdateTokens={this.handleUpdateTokens}
                 onBurnTokens={this.handleBurnTokens}
+                onClaimToken={this.handleClaimToken}
                 getHolderBalance={this.getHolderBalance}
                 getHolderClaimed={this.getHolderClaimed}
                 getHolderLocked={this.getHolderLocked}

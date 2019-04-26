@@ -116,14 +116,14 @@ async function createStore(token, tokenAddr, tokensale, tokensaleAddr) {
           default:
             break
         }
-      } else if (addressesEqual(address, tokensaleAddr)) {
+      /*} else if (addressesEqual(address, tokensaleAddr)) {
         switch (event) {
           case 'LogTokensPurchased':
             nextState = await tokensPurchased(nextState, returnValues)
             break
           default:
             break
-        }
+        }*/
       } else {
         switch (event) {
           case 'TokenClaimed':

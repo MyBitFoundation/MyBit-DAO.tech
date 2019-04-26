@@ -36,7 +36,6 @@ class HolderRow extends React.Component {
       address,
       name,
       balance,
-      contribution,
       claimed,
       claimAmount,
       isCurrentUser,
@@ -52,7 +51,7 @@ class HolderRow extends React.Component {
       <TableRow>
         <TableCell>
           <Owner>
-            <span>{name}</span>
+            <span>{name ? name : address}</span>
             {isCurrentUser && (
               <Badge.Identity
                 style={{ fontVariant: 'small-caps' }}
@@ -62,9 +61,6 @@ class HolderRow extends React.Component {
               </Badge.Identity>
             )}
           </Owner>
-        </TableCell>
-        <TableCell align="right">
-          {formatBalance(contribution, ethDecimalsBase)}
         </TableCell>
         <TableCell align="right">
           {formatBalance(balance, tokenDecimalsBase)}

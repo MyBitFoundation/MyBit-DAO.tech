@@ -57,8 +57,9 @@ contract Kit is KitBase {
     address constant ANY_ENTITY = address(-1);
     uint64 constant PERIOD = 2592000; //30 days
     uint256 constant TOKEN_SUPPLY = 10**30;
-    address whitelist = msg.sender;
-    string hashlist = 'QmanPRXCzxXXfizjnWr7Fe5x57GH4gBTrFN9nUY1vVdLCV';
+    address constant whitelist = msg.sender;
+    //string hashlist = 'QmanPRXCzxXXfizjnWr7Fe5x57GH4gBTrFN9nUY1vVdLCV';
+    string constant hashlist = 'QmRxP22s7mXZicSh1jvQq6s1Vuosye6H887JUXCrc4t3gd';
 
     constructor(ENS ens) KitBase(DAOFactory(0), ens) {
         tokenFactory = new MiniMeTokenFactory();

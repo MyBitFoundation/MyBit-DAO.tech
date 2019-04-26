@@ -38,7 +38,8 @@ class App extends React.Component {
     tokenAddress: null,
   }
   state = {
-    users: [],
+    users: {},
+    queried: {},
     sidepanelOpened: false,
     token: null,
   }
@@ -52,20 +53,31 @@ class App extends React.Component {
       })
     }
     if(users){
-      let userDict = {}
+      let userDict = this.state.users
+      let queriedDict = this.state.queried
       let promiseArray = []
-      users.forEach((user) => {
+      let userArray = [];
+      users
+      .filter((user) => !queriedDict[user])
+      .forEach((user) => {
+        queriedDict[user] = true
         userDict[user] = user
+        this.setState({users: userDict})
+        this.setState({queried: queriedDict})
         promiseArray.push(Box.getProfile(user))
+        userArray.push(user)
       })
-      this.setState({users: userDict})
       const profiles = await Promise.all(promiseArray)
-      for(var i=0; i<users.length; i++){
-        if(profiles[i].name != undefined && profiles[i].name != ''){
-          userDict[users[i]] = profiles[i].name
+      for(var i=0; i<profiles.length; i++){
+        if(profiles[i].name){
+          const userIndex = users.findIndex(user =>
+            addressesEqual(user, userArray[i])
+          )
+          if(profiles[i].name != '') userDict[users[userIndex]] = profiles[i].name
         }
       }
       this.setState({users: userDict})
+      this.setState({queried: queriedDict})
     }
   }
 

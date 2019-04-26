@@ -19,6 +19,7 @@ const initialState = {
   holderLocked: new BN(0),
   actionAmount: 0,
   burnMessage: '',
+  day: 1,
   error: null,
   warning: null,
 }
@@ -100,6 +101,9 @@ class TokensPanelContent extends React.Component {
   handleBurnMessage = event => {
     this.setState({ burnMessage: event.target.value })
   }
+  handleClaimDay = event => {
+    this.setState({ day: event.target.value })
+  }
   handleSubmit = event => {
     event.preventDefault()
     const { mode, holderAddress, tokenIntervals } = this.props
@@ -109,6 +113,10 @@ class TokensPanelContent extends React.Component {
         address: holderAddress,
         message: burnMessage
       })
+    } else if(mode === 'claim'){
+      const { day } = this.state
+      const daySubOne = day-1;
+      this.props.onClaimToken(daySubOne)
     } else {
       const { items, selected } = this.state
       const diff = tokenIntervals.length - items.length
@@ -120,7 +128,7 @@ class TokensPanelContent extends React.Component {
     }
   }
   render() {
-    const { items, selected, erc20Symbol, tokenSymbol, holderBalance, holderClaimed, holderLocked, burnMessage, actionAmount, error, warning } = this.state
+    const { items, selected, erc20Symbol, tokenSymbol, holderBalance, holderClaimed, holderLocked, burnMessage, day, actionAmount, error, warning } = this.state
     const { mode, tokenDecimalsBase, erc20DecimalsBase } = this.props
 
     const errorMessage = error
@@ -130,16 +138,26 @@ class TokensPanelContent extends React.Component {
       <div>
         <form onSubmit={this.handleSubmit}>
           {mode === 'lock'  && (
-            <RadioList
-              title="Lock Time"
-              description="By locking your tokens you can increase your voting power"
-              items={items}
-              selected={selected}
-              onChange={this.handleChange}
-            />
+            <div>
+              <Info.Permissions title="Approval">
+                To lock tokens you must first get whitelisted using the MyID app. Your transaction will fail if you are not approved.
+              </Info.Permissions>
+              <br />
+              <RadioList
+                title="Lock Time"
+                description="By locking your tokens you can increase your voting power"
+                items={items}
+                selected={selected}
+                onChange={this.handleChange}
+              />
+            </div>
           )}
           {mode === 'unlock'  && (
             <div>
+              <Info.Permissions title="Time Restricted">
+                This transaction will fail if the lock time has not passed
+              </Info.Permissions>
+              <br />
               <Field label={`${erc20Symbol} Tokens to unlock: ${formatBalance(holderLocked, erc20DecimalsBase)}`}></Field>
               <Field label={`${tokenSymbol} Tokens burned: ${formatBalance(holderBalance.sub(holderClaimed), tokenDecimalsBase)}`}></Field>
             </div>
@@ -147,13 +165,32 @@ class TokensPanelContent extends React.Component {
           {mode === 'burn'  && (
             <Field label={`Reason for burning ${formatBalance(holderBalance, tokenDecimalsBase)} ${tokenSymbol}`}>
               <TextInput
-                innerRef={burnMessage => (this.messageInput = burnMessage)}
+                ref={burnMessage => (this.messageInput = burnMessage)}
                 value={burnMessage}
                 onChange={this.handleBurnMessage}
                 required
                 wide
               />
             </Field>
+          )}
+          {mode === 'claim'  && (
+            <div>
+              <Info.Permissions title="Approval">
+                To claim a token you must first get whitelisted using the MyID app. Your transaction will fail if you are not approved or if you have already claimed a token
+              </Info.Permissions>
+              <br />
+              <Field label={'Please submit the day you contributed to the token sale'}>
+                <TextInput.Number
+                  ref={day => (this.messageInput = day)}
+                  value={day}
+                  onChange={this.handleClaimDay}
+                  min={1}
+                  max={365}
+                  required
+                  wide
+                />
+              </Field>
+            </div>
           )}
           <br/>
           <Button
@@ -162,7 +199,7 @@ class TokensPanelContent extends React.Component {
             disabled={actionAmount === '0'}
             wide
           >
-            {mode === 'burn' ? 'Burn' : (mode === 'lock' ? 'Lock' : 'Unlock')}
+            {mode === 'burn' ? 'Burn' : (mode === 'claim' ? 'Claim' : (mode === 'lock' ? 'Lock' : 'Unlock'))}
           </Button>
           <Messages>
             {errorMessage && <ErrorMessage message={errorMessage} />}

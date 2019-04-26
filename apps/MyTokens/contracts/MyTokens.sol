@@ -105,7 +105,7 @@ contract MyTokens is ITokenController, IForwarder, AragonApp {
     */
     function claim(uint16 _day) external {
       if(whitelist != address(0)){
-        require(whitelist.checkWhitelist(msg.sender));
+        require(whitelist.checkWhitelist(msg.sender), 'User not in whitelist');
       }
       require(_authorized(msg.sender, _day), 'User not authorized to claim any tokens');
       require(!claimedToken[msg.sender], 'User has already claimed tokens');
@@ -119,7 +119,7 @@ contract MyTokens is ITokenController, IForwarder, AragonApp {
     */
     function lock(uint256 _lockTime) external {
       if(whitelist != address(0)){
-        require(whitelist.checkWhitelist(msg.sender));
+        require(whitelist.checkWhitelist(msg.sender), 'User not in whitelist');
       }
       uint amount;
       uint lockVal;
@@ -192,7 +192,7 @@ contract MyTokens is ITokenController, IForwarder, AragonApp {
     }
 
     /**
-     * @notice Change locking values
+     * @notice Change locking values to lock `_lockAmounts` for `_lockIntervals` amount of time to receive `_tokenIntervals`
      */
     function changeLocks(
         uint256[] _lockAmounts,
@@ -325,6 +325,9 @@ contract MyTokens is ITokenController, IForwarder, AragonApp {
         return false;
     }
 
+    /**
+    * @notice Set the recovery status to `_status`
+    */
     function setRecoveryStatus(bool _status)  external auth(MANAGER_ROLE){
       recoveryStatus = _status;
     }
