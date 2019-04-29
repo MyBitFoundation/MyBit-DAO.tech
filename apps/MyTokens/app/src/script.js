@@ -3,7 +3,6 @@ import { of } from './rxjs'
 import tokenSettings, { hasLoadedTokenSettings } from './token-settings'
 import { addressesEqual } from './web3-utils'
 import tokenAbi from './abi/minimeToken.json'
-import tokensaleAbi from './abi/tokensale.json'
 
 const INITIALIZATION_TRIGGER = Symbol('INITIALIZATION_TRIGGER')
 
@@ -73,7 +72,7 @@ async function initialize(tokenAddr) {
 }
 
 // Hook up the script as an aragon.js store
-async function createStore(token, tokenAddr, tokensale, tokensaleAddr) {
+async function createStore(token, tokenAddr) {
   return app.store(
     async (state, { address, event, returnValues }) => {
       let nextState = {
@@ -89,7 +88,6 @@ async function createStore(token, tokenAddr, tokensale, tokensaleAddr) {
           holders: [],
           tokenAddress: tokenAddr,
           erc20Address: await loadERC20(),
-          claimAmount: await loadClaimAmount(),
         }
       } else if (addressesEqual(address, tokenAddr)) {
         switch (event) {
@@ -99,14 +97,6 @@ async function createStore(token, tokenAddr, tokensale, tokensaleAddr) {
           default:
             break
         }
-      /*} else if (addressesEqual(address, tokensaleAddr)) {
-        switch (event) {
-          case 'LogTokensPurchased':
-            nextState = await tokensPurchased(nextState, returnValues)
-            break
-          default:
-            break
-        }*/
       } else {
         switch (event) {
           case 'TokenClaimed':
@@ -126,7 +116,7 @@ async function createStore(token, tokenAddr, tokensale, tokensaleAddr) {
       of({ event: INITIALIZATION_TRIGGER }),
       // Merge in the token's events into the app's own events for the store
       token.events(),
-      tokensale.events(),
+      //tokensale.events(),
     ]
   )
 }
@@ -138,6 +128,7 @@ async function createStore(token, tokenAddr, tokensale, tokensaleAddr) {
  ***********************/
 async function transfer(token, state, { _from, _to, _amount }) {
   //const changes = await loadNewBalances(token, _from, _to)
+  console.log('Transfer event')
   let changes;
   if(_from != "0x0000000000000000000000000000000000000000"){
     changes = {
@@ -161,18 +152,6 @@ async function transfer(token, state, { _from, _to, _amount }) {
       changes
     )
   }
-}
-
-async function tokensPurchased(state, { _contributor, _amount, _day }) {
-  const changes = {
-    address: _contributor,
-    contribution: _amount,
-    day: _day,
-  }
-  return updateContributorState(
-    { ...state },
-    changes
-  )
 }
 
 async function tokenClaimed(state, { user }) {
@@ -210,15 +189,7 @@ function updateHolderState(state, changes) {
     holders: updateHolders(holders, changes),
   }
 }
-/*
-function updateContributorState(state, changes) {
-  const { holders = [] } = state
-  return {
-    ...state,
-    holders: updateContributors(holders, changes)
-  }
-}
-*/
+
 function updateClaimedState(state, changes) {
   const { holders = [] } = state
   return {
@@ -250,23 +221,7 @@ function updateHolders(holders, changed) {
   }
   return holders
 }
-/*
-function updateContributors(holders, changed) {
-  const contributorIndex = holders.findIndex(contributor =>
-    addressesEqual(contributor.address, changed.address)
-  )
-  if(contributorIndex === -1) {
-    holders.push(changed)
-  } else {
-    if(!holders[contributorIndex].contribution){
-      holders[contributorIndex].contribution = '0'
-    }
-    holders[contributorIndex].contribution = String(Number(holders[contributorIndex].contribution) + Number(changed.contribution))
-    holders[contributorIndex].day = changed.day
-  }
-  return holders
-}
-*/
+
 function updateClaims(holders, changed) {
   const claimantIndex = holders.findIndex(claimant =>
     addressesEqual(claimant.address, changed.address)
@@ -295,15 +250,6 @@ function loadERC20() {
   return new Promise((resolve, reject) =>
     app
       .call('erc20')
-      .first()
-      .subscribe(resolve, reject)
-  )
-}
-
-function loadClaimAmount() {
-  return new Promise((resolve, reject) =>
-    app
-      .call('claimAmount')
       .first()
       .subscribe(resolve, reject)
   )

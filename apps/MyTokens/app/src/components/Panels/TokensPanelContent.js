@@ -118,12 +118,15 @@ class TokensPanelContent extends React.Component {
       const daySubOne = day-1;
       this.props.onClaimToken(daySubOne)
     } else {
-      const { items, selected } = this.state
+      const { items, selected, holderLocked } = this.state
+      const { lockAmounts } = this.props
       const diff = tokenIntervals.length - items.length
       const index = selected + diff
+      const amount = new BN(lockAmounts[index]).sub(holderLocked).toString()
       this.props.onUpdateTokens({
         mode,
-        index
+        index,
+        amount
       })
     }
   }

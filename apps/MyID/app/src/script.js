@@ -147,21 +147,14 @@ function updateRequests(state, returnValues) {
       approved: false,
       failed: false
     })
-  } else {
-    identities[idIndex] = {
-      ...returnValues,
-      initiated: false,
-      authorized: false,
-      approved: false,
-      failed: false,
-    }
   }
+
   return {
     ...state,
     identities
   }
 }
-function updateAuthorized(state, { user, requestID }) {
+function updateAuthorized(state, { user }) {
   const { identities = [] } = state
   const idIndex = identities.findIndex(id =>
     addressesEqual(id.user, user)
@@ -175,7 +168,7 @@ function updateAuthorized(state, { user, requestID }) {
     identities
   }
 }
-function updateRevoked(state, { user, requestID }) {
+function updateRevoked(state, { user }) {
   const { identities = [] } = state
   const idIndex = identities.findIndex(id =>
     addressesEqual(id.user, user)

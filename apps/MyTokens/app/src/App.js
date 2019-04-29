@@ -4,17 +4,19 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import BN from 'bn.js'
 import {
-  Viewport,
-  AppBar,
-  AppView,
-  Badge,
-  BaseStyles,
-  Button,
   PublicUrl,
+  BaseStyles,
+  Viewport,
+  AppView,
+  AppBar,
+  BreakPoint,
   SidePanel,
+  Badge,
+  Button,
+  SafeLink,
+  Info,
   font,
   observe,
-  BreakPoint,
 } from '@aragon/ui'
 import EmptyState from './screens/EmptyState'
 import Holders from './screens/Holders'
@@ -34,8 +36,8 @@ const initialLockTokensConfig = {
 
 class App extends React.Component {
   static propTypes = {
-    app: PropTypes.object.isRequired,
-    sendMessageToWrapper: PropTypes.func.isRequired,
+    app: PropTypes.object,
+    sendMessageToWrapper: PropTypes.func,
   }
   static defaultProps = {
     appStateReady: false,
@@ -228,13 +230,13 @@ class App extends React.Component {
       return true
     }
   }
-  handleUpdateTokens = ({ mode, index}) => {
+  handleUpdateTokens = ({ mode, index, amount}) => {
     const { app, erc20Address } = this.props
-    const { lockAmounts, lockIntervals } = this.state
+    const { lockIntervals } = this.state
 
     if (mode === 'lock') {
       let intentParams = {
-        token: { address: erc20Address, value: lockAmounts[index] },
+        token: { address: erc20Address, value: amount },
         // While it's generally a bad idea to hardcode gas in intents, in the case of token deposits
         // it prevents metamask from doing the gas estimation and telling the user that their
         // transaction will fail (before the approve is mined).
@@ -243,14 +245,29 @@ class App extends React.Component {
         // forwarded (unlikely in deposit).
         gas:'500000'
       }
-
       app.lock(lockIntervals[index], intentParams)
+        .subscribe(
+          txHash => {
+            //console.log('Tx: ', txHash)
+            this.handleSidepanelClose()
+          },
+          err => {
+            console.error(err)
+            this.handleSidepanelClose()
+          })
     }
     if (mode === 'unlock') {
       app.unlock()
+        .subscribe(
+          txHash => {
+            //console.log('Tx: ', txHash)
+            this.handleSidepanelClose()
+          },
+          err => {
+            console.error(err)
+            this.handleSidepanelClose()
+          })
     }
-
-    this.handleSidepanelClose()
   }
   /*
   handleClaimToken = () => {
@@ -290,19 +307,17 @@ class App extends React.Component {
           this.handleSidepanelClose()
         })
   }
-  handleLaunchLockTokensNoHolder = () => {
+  handleLaunchLockTokens = () => {
     const { userAccount } = this.props
-    this.handleLaunchLockTokens(userAccount)
-  }
-  handleLaunchLockTokens = address => {
     this.setState({
-      lockTokensConfig: { mode: 'lock', holderAddress: address },
+      lockTokensConfig: { mode: 'lock', holderAddress: userAccount },
       sidepanelOpened: true,
     })
   }
-  handleLaunchUnlockTokens = address => {
+  handleLaunchUnlockTokens = () => {
+    const { userAccount } = this.props
     this.setState({
-      lockTokensConfig: { mode: 'unlock', holderAddress: address },
+      lockTokensConfig: { mode: 'unlock', holderAddress: userAccount },
       sidepanelOpened: true,
     })
   }
@@ -324,11 +339,6 @@ class App extends React.Component {
   }
   handleSidepanelClose = () => {
     this.setState({ sidepanelOpened: false })
-  }
-  handleSidepanelTransitionEnd = open => {
-    if (!open) {
-      this.setState({ lockTokensConfig: initialLockTokensConfig })
-    }
   }
   render() {
     const {
@@ -381,7 +391,7 @@ class App extends React.Component {
                     <Button
                       style={{'marginLeft':'10px'}}
                       mode="strong"
-                      onClick={this.handleLaunchLockTokensNoHolder}
+                      onClick={this.handleLaunchLockTokens}
                     >
                       Lock {erc20Symbol}
                     </Button>
@@ -389,6 +399,10 @@ class App extends React.Component {
                 />
               }
             >
+              <Info.Action>
+                <SafeLink href='https://medium.com/mybit-dapp/mybit-dao-tutorial-5b3bc093963b' target='_blank'>MyBit DAO tutorial</SafeLink>
+              </Info.Action>
+              <br />
               {appStateReady && holders.length > 0 ? (
                 <Holders
                   holders={holders}
@@ -409,7 +423,7 @@ class App extends React.Component {
                   onBurnTokens={this.handleLaunchBurnTokens}
                 />
               ) : (
-                <EmptyState onActivate={this.handleLaunchLockTokensNoHolder} />
+                <EmptyState onActivate={this.handleLaunchLockTokens} />
               )}
             </AppView>
             )}
@@ -426,7 +440,6 @@ class App extends React.Component {
             }
             opened={sidepanelOpened}
             onClose={this.handleSidepanelClose}
-            onTransitionEnd={this.handleSidepanelTransitionEnd}
           >
             {appStateReady && erc20Loaded && (
               <TokensPanelContent

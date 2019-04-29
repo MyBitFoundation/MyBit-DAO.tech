@@ -20,12 +20,12 @@ class HolderRow extends React.Component {
     onUnlockTokens: () => {},
   }
   handleLockTokens = () => {
-    const { address, onLockTokens } = this.props
-    onLockTokens(address)
+    const { onLockTokens } = this.props
+    onLockTokens()
   }
   handleUnlockTokens = () => {
-    const { address, onUnlockTokens } = this.props
-    onUnlockTokens(address)
+    const { onUnlockTokens } = this.props
+    onUnlockTokens()
   }
   handleBurnTokens = () => {
     const { address, onBurnTokens } = this.props

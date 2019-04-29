@@ -43,7 +43,6 @@ class Identities extends React.Component {
   componentWillReceiveProps = async ({ userAccount, getBalance }) => {
     if(userAccount != ''){
       const balance = await getBalance(userAccount)
-      console.log('Balance: ', balance);
       if(balance > 0){
         this.setState({
           ...this.state,

@@ -6,7 +6,7 @@
   "dependencies": {
     "3box": "^1.6.2",
     "@aragon/client": "^1.1.0",
-    "@aragon/ui": "^0.27.0",
+    "@aragon/ui": "0.34.0",
     "@material-ui/core": "^3.9.2",
     "bn.js": "^4.11.6",
     "ipfs-http-client": "^29.1.1",

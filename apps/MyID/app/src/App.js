@@ -5,16 +5,19 @@ import styled from 'styled-components'
 import BN from 'bn.js'
 import showdown from 'showdown'
 import {
-  AppBar,
-  AppView,
-  Badge,
-  BaseStyles,
-  Button,
   PublicUrl,
+  BaseStyles,
+  Viewport,
+  AppView,
+  AppBar,
+  BreakPoint,
   SidePanel,
+  Badge,
+  Button,
+  SafeLink,
+  Info,
   font,
   observe,
-  BreakPoint,
 } from '@aragon/ui'
 import EmptyState from './screens/EmptyState'
 import Identities from './screens/Identities'
@@ -25,8 +28,8 @@ import tokenAbi from './abi/minimeToken.json'
 
 class App extends React.Component {
   static propTypes = {
-    app: PropTypes.object.isRequired,
-    sendMessageToWrapper: PropTypes.func.isRequired,
+    app: PropTypes.object,
+    sendMessageToWrapper: PropTypes.func,
   }
   static defaultProps = {
     requests: [],
@@ -211,47 +214,56 @@ class App extends React.Component {
       <PublicUrl.Provider url="./aragon-ui/">
         <BaseStyles />
         <Main>
-          <AppView
-            appBar={
-              <AppBar
-                title={
-                  <Title>
-                    <BreakPoint to="medium">
-                      <MenuButton onClick={this.handleMenuPanelOpen} />
-                    </BreakPoint>
-                    <TitleLabel>MyID</TitleLabel>
-                  </Title>
+          <Viewport>
+            {({ breakpoints }) => (
+              <AppView
+                padding={width < breakpoints.medium ? 0 : 30}
+                appBar={
+                  <AppBar
+                    title={
+                      <Title>
+                        <BreakPoint to="medium">
+                          <MenuButton onClick={this.handleMenuPanelOpen} />
+                        </BreakPoint>
+                        <TitleLabel>MyID</TitleLabel>
+                      </Title>
+                    }
+                    endContent={
+                      <Button
+                        mode="strong"
+                        onClick={this.handleSidepanelOpen}
+                      >
+                        Request Confirmation
+                      </Button>
+                    }
+                  />
                 }
-                endContent={
-                  <Button
-                    mode="strong"
-                    onClick={this.handleSidepanelOpen}
-                  >
-                    Request Confirmation
-                  </Button>
-                }
-              />
-            }
-          >
-            {(requests.length > 0 || proposals.length > 0 || authorized.length > 0 || failed.length > 0 || approved.length > 0) ? (
-              <Identities
-                users={users}
-                requests={requests}
-                proposals={proposals}
-                approved={approved}
-                authorized={authorized}
-                failed={failed}
-                userAccount={userAccount}
-                ipfsAPI={ipfs}
-                ipfsURL={ipfsURL}
-                getBalance={this.getBalance}
-                onInitiateAuth={this.handleRequest}
-                onInitiateRevoke={this.handleRevoke}
-              />
-            ) : (
-              <EmptyState onActivate={this.handleSidepanelOpen} />
+              >
+                <Info.Action>
+                  <SafeLink href='https://medium.com/mybit-dapp/mybit-dao-tutorial-5b3bc093963b' target='_blank'>MyBit DAO tutorial</SafeLink>
+                </Info.Action>
+                <br />
+                {(requests.length > 0 || proposals.length > 0 || authorized.length > 0 || failed.length > 0 || approved.length > 0) ? (
+                  <Identities
+                    users={users}
+                    requests={requests}
+                    proposals={proposals}
+                    approved={approved}
+                    authorized={authorized}
+                    failed={failed}
+                    userAccount={userAccount}
+                    ipfsAPI={ipfs}
+                    ipfsURL={ipfsURL}
+                    getBalance={this.getBalance}
+                    onInitiateAuth={this.handleRequest}
+                    onInitiateRevoke={this.handleRevoke}
+                  />
+                ) : (
+                  <EmptyState onActivate={this.handleSidepanelOpen} />
+                )}
+              </AppView>
             )}
-          </AppView>
+          </Viewport>
           <SidePanel
             title={
               'Request Identity Confirmation'
@@ -314,10 +326,12 @@ export default observe(
         authorized: identities
           ? identities
               .filter(({ authorized }) => authorized === true)
+              .reverse()
           : [],
         failed: identities
           ? identities
               .filter(({ failed }) => failed === true)
+              .reverse()
           : [],
       }
     }),
