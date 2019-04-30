@@ -1,5 +1,9 @@
 #MyID
 ## Mainnet Deployment
+### myid.open.aragonpm.eth v1.0.2:
+ - Content (ipfs): QmVdE11Pdhxo35qkECAaboJsiSNJCDqu9wFf3Q8GoMSwWC
+ - Transaction hash: 0x7b4eda42142e9b35a432ad00fee8ff59060cebe97cda98ac0e5de06bae07d34c
+
 ### myid.open.aragonpm.eth v1.0.1:
  - Content (ipfs): QmSinBwCtXbTvu4b2KVahSiciADRcY593emobdCuxbrtw8
  - Transaction hash: 0x7548dcf8c49c71346aae040f87727c08cb0f73e41acf348912b5ae8834778cb7

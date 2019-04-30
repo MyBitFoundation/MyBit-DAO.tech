@@ -94,7 +94,7 @@ class Identities extends React.Component {
         <br/>
         <Grid>
           {items[selected] == 'Requests' &&
-           requests.map(({ user, requestID, ipfs }) => (
+           requests.map(({ user, ipfs }) => (
               <UserCard
                 key={user}
                 address={user}
@@ -108,7 +108,7 @@ class Identities extends React.Component {
               />
             ))}
           {items[selected] == 'Proposals' &&
-           proposals.map(({ user, requestID, ipfs }) => (
+           proposals.map(({ user, ipfs }) => (
               <UserCard
                 key={user}
                 address={user}
@@ -120,7 +120,7 @@ class Identities extends React.Component {
               />
             ))}
           {items[selected] == 'Confirmed' &&
-           authorized.map(({ user, requestID, ipfs }) => (
+           authorized.map(({ user, ipfs }) => (
               <UserCard
                 key={user}
                 address={user}
@@ -134,7 +134,7 @@ class Identities extends React.Component {
               />
             ))}
           {items[selected] == 'Rejected' &&
-           failed.map(({ user, requestID, ipfs }) => (
+           failed.map(({ user, ipfs }) => (
               <UserCard
                 key={user}
                 address={user}
@@ -148,7 +148,7 @@ class Identities extends React.Component {
               />
             ))}
           {items[selected] == 'Awaiting Confirmation...' &&
-           approved.map(({ user, requestID, ipfs }) => (
+           approved.map(({ user, ipfs }) => (
               <UserCard
                 key={user}
                 address={user}

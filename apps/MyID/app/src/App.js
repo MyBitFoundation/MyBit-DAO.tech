@@ -45,6 +45,7 @@ class App extends React.Component {
     //queried: {},
     sidepanelOpened: false,
     token: null,
+    width: undefined
   }
 
   componentWillReceiveProps = async ({ app, tokenAddress, userAccount, users }) => {
@@ -84,6 +85,19 @@ class App extends React.Component {
       this.setState({queried: queriedDict})
     }
     */
+  }
+
+  componentDidMount() {
+    this.updateDimensions();
+    window.addEventListener("resize", this.updateDimensions.bind(this));
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateDimensions.bind(this));
+  }
+
+  updateDimensions() {
+    this.setState({ width: window.innerWidth });
   }
 
   getBalance = (userAccount) => {
@@ -209,6 +223,7 @@ class App extends React.Component {
     const {
       users,
       sidepanelOpened,
+      width
     } = this.state
     return (
       <PublicUrl.Provider url="./aragon-ui/">

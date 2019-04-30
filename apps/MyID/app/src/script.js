@@ -147,6 +147,8 @@ function updateRequests(state, returnValues) {
       approved: false,
       failed: false
     })
+  } else {
+    identities[idIndex].ipfs = returnValues.ipfs
   }
 
   return {
