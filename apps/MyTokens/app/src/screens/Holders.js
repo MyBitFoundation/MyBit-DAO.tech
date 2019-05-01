@@ -82,16 +82,15 @@ class Holders extends React.Component {
                    }
                    noSideBorders={compactTable}
                  >
-                   {holders.map(({ address, balance, contribution, claimed }) => (
+                   {holders.map(({ address, balance}) => (
                      <HolderRow
                        key={address}
                        address={address}
                        name={users[address]}
                        balance={balance}
-                       claimed={claimed}
                        claimAmount={claimAmount}
                        isCurrentUser={userAccount && userAccount === address}
-                       maxAccountTokens={claimed ? maxAccountTokens.add(claimAmount) : maxAccountTokens}
+                       maxAccountTokens={maxAccountTokens}
                        erc20Symbol={erc20Symbol}
                        tokenDecimalsBase={tokenDecimalsBase}
                        ethDecimalsBase={ethDecimalsBase}

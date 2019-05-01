@@ -1,5 +1,21 @@
 # MyTokens
 ## Mainnet Deployment
+### mytokens.open.aragonpm.eth v1.0.11:
+ - Content (ipfs): QmRQzYv4bQwjLQapHHa6pnNwQ7SeywXBEVcpn1N1yPh9jf
+ - Transaction hash: 0x5d3b30a4d97ed8270d156b0c54d6fc6cbe23d82d7967c64ce9920934043e94c1
+
+### mytokens.open.aragonpm.eth v1.0.10:
+ - Content (ipfs): QmVrk8C1FwAq11Bpbo2hzRQcLjMh9LjPYpDS7ue63jsmVG
+ - Transaction hash: 0x8920501872deda2029905ef493d85145262e7cd9b33fe187cbaae2aa777ecf73
+
+### mytokens.open.aragonpm.eth v1.0.9:
+ - Content (ipfs): QmPNvG78Sb4F8x3GLpcrZsmWv6ap2Xj6chDuKFE3D5u43V
+ - Transaction hash: 0xd6c4d55c6dd58b6e5085504ad6818281b00cd0f21688702b65a1a1fb852487e3
+
+### mytokens.open.aragonpm.eth v1.0.8:
+ - Content (ipfs): QmbsYjHkrkqBhzFsJ6CPxNSnp9bEmP6iY6ZdV3nFaF7BCe
+ - Transaction hash: 0x33d0de055f8875640349d2de92d5eb16f5e938e0bb38e62bbe92df341d014945
+
 ### mytokens.open.aragonpm.eth v1.0.7:
  - Content (ipfs): QmeF9vTKNordHKBohTyTg6Gd1R2hyFN2XT74i8PdCma93o
  - Transaction hash: 0xec60b0e820532ffc5942beb0e5f46baa433f804301b9fcb157e4e729653ecd3d
@@ -34,6 +50,10 @@
  - Transaction hash: 0xbb555c445188ee966d59b062974aebf1e5aa4029055cf485efe279d2f0a647b8
 
 ## Rinkeby Deployment
+### mytokens.open.aragonpm.eth v1.0.4:
+ - Content (ipfs): QmSV7VveMAQfpKNrDRV6mnAy7M7Wyp17QHqkUrjjSch1jA
+ - Transaction hash: 0xb7ba50072e74c9b37ee3a12b644b6f6f550aa5d7734fac3bef4db4b992984a09
+
 ### mytokens.open.aragonpm.eth v1.0.3:
  - Content (ipfs): QmaTjfPKQ3z4Tp2J59XHBc7yovijzoKt9oDA52YTNXoM4z
  - Transaction hash: 0x09c5c917682b263098a4d51cdca9f4bbf52e3e9091621a1a2f02116b284645e2

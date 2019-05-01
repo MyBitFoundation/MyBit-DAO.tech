@@ -23,10 +23,11 @@ import Holders from './screens/Holders'
 import TokensPanelContent from './components/Panels/TokensPanelContent'
 import MenuButton from './components/MenuButton/MenuButton'
 import { networkContextType } from './provide-network'
-import { erc20Settings, hasLoadedERC20Settings, hasLoadedTokenSettings } from './token-settings'
+import { hasLoadedTokenSettings } from './token-settings'
+import { hasLoadedERC20Settings } from './erc20-settings'
+import { hasLoadedLockSettings } from './lock-settings'
 import { makeEtherscanBaseUrl } from './utils'
 import { addressesEqual } from './web3-utils'
-import erc20Abi from './abi/standardToken.json'
 
 
 const initialLockTokensConfig = {
@@ -44,72 +45,14 @@ class App extends React.Component {
     holders: [],
     network: {},
     userAccount: '',
+    tokenTransfersEnabled: false,
   }
   state = {
     users: {},
     //queried: {},
-    erc20Processing: false,
-    erc20Loaded: false,
-    erc20Symbol: 'ERC20',
     lockTokensConfig: initialLockTokensConfig,
     sidepanelOpened: false,
     width: undefined
-  }
-
-  async componentWillReceiveProps({ app, erc20Address, holders }) {
-    if(!this.state.erc20Processing && erc20Address !== undefined){
-      this.state.erc20Processing = true
-      let erc20 = app.external(erc20Address, erc20Abi)
-      let tempData = await this.loadERC20Settings(erc20)
-      let erc20DecimalsBase = new BN(10).pow(new BN(tempData.erc20Decimals))
-      let erc20Data = {
-        ...tempData,
-        erc20DecimalsBase,
-        erc20Decimals: new BN(tempData.erc20Decimals),
-        erc20Supply: new BN(tempData.erc20Supply)
-      }
-      this.setState({
-        ...this.state,
-        ...erc20Data,
-        lockAmounts: await this.loadLockAmounts(app),
-        lockIntervals: await this.loadLockIntervals(app),
-        tokenIntervals: await this.loadTokenIntervals(app),
-        erc20Loaded:true
-      })
-    }
-    /* REMOVED BECAUSE 3BOX CAUSES ERRORS IN FIREFOX
-    if(holders){
-      let userDict = this.state.users
-      let queriedDict = this.state.queried
-      let promiseArray = [];
-      let holderArray = [];
-      holders
-      .filter(({ address }) => !queriedDict[address])
-      .forEach((holder) => {
-        queriedDict[holder.address] = true
-        userDict[holder.address] = holder.address
-        this.setState({users: userDict})
-        this.setState({queried: queriedDict})
-        promiseArray.push(getProfile(holder.address))
-        holderArray.push(holder.address)
-      })
-      const profiles = await Promise.all(promiseArray)
-      for(var i=0; i<profiles.length; i++){
-        if(profiles[i].name){
-          const holderIndex = holders.findIndex(holder =>
-            addressesEqual(holder.address, holderArray[i])
-          )
-          if(profiles[i].name != '') userDict[holders[holderIndex].address] = profiles[i].name
-        }
-      }
-      this.setState({users: userDict})
-      this.setState({queried: queriedDict})
-    }
-    */
-  }
-
-  updateDimensions() {
-    this.setState({ width: window.innerWidth });
   }
 
   componentDidMount() {
@@ -121,59 +64,14 @@ class App extends React.Component {
     window.removeEventListener("resize", this.updateDimensions.bind(this));
   }
 
-  loadERC20Settings(token) {
-    return Promise.all(
-      erc20Settings.map(
-        ([name, key, type = 'string']) =>
-          new Promise((resolve, reject) =>
-            token[name]()
-              .first()
-              .subscribe(value => {
-                resolve({ [key]: value })
-              }, reject)
-          )
-      )
-    ).then(settings =>
-        settings.reduce((acc, setting) => ({ ...acc, ...setting }), {})
-      )
-      .catch(err => {
-        console.error("Failed to load token's settings", err)
-        // Return an empty object to try again later
-        return {}
-      })
+  updateDimensions() {
+    this.setState({ width: window.innerWidth });
   }
-
-  loadLockAmounts(app) {
-    return new Promise((resolve, reject) =>
-      app
-        .call('getLockAmounts()')
-        .first()
-        .subscribe(resolve, reject)
-    )
-  }
-
-  loadLockIntervals(app) {
-    return new Promise((resolve, reject) =>
-      app
-        .call('getLockIntervals()')
-        .first()
-        .subscribe(resolve, reject)
-    )
-  }
-
-  loadTokenIntervals(app) {
-    return new Promise((resolve, reject) =>
-      app
-        .call('getTokenIntervals()')
-        .first()
-        .subscribe(resolve, reject)
-    )
-  }
-
 
   static childContextTypes = {
     network: networkContextType,
   }
+
   getChildContext() {
     const { network } = this.props
 
@@ -184,6 +82,7 @@ class App extends React.Component {
       },
     }
   }
+
   getHolderBalance = address => {
     const { holders } = this.props
     const holder = holders.find(holder =>
@@ -231,8 +130,7 @@ class App extends React.Component {
     }
   }
   handleUpdateTokens = ({ mode, index, amount}) => {
-    const { app, erc20Address } = this.props
-    const { lockIntervals } = this.state
+    const { app, erc20Address, lockIntervals } = this.props
 
     if (mode === 'lock') {
       let intentParams = {
@@ -355,19 +253,19 @@ class App extends React.Component {
       tokenTransfersEnabled,
       userAccount,
       claimAmount,
-    } = this.props
-    const {
-      users,
-      erc20Loaded,
-      lockTokensConfig,
-      sidepanelOpened,
       erc20DecimalsBase,
       erc20Symbol,
       lockAmounts,
       lockIntervals,
       tokenIntervals,
+    } = this.props
+    const {
+      users,
+      lockTokensConfig,
+      sidepanelOpened,
       width,
     } = this.state
+
     return (
       <PublicUrl.Provider url="./aragon-ui/">
         <BaseStyles />
@@ -441,7 +339,7 @@ class App extends React.Component {
             opened={sidepanelOpened}
             onClose={this.handleSidepanelClose}
           >
-            {appStateReady && erc20Loaded && (
+            {appStateReady && (
               <TokensPanelContent
                 opened={sidepanelOpened}
                 tokenSymbol={tokenSymbol}
@@ -488,26 +386,32 @@ export default observe(
   // and calculate tokenDecimalsBase.
   observable =>
     observable.map(state => {
-      const appStateReady = hasLoadedTokenSettings(state)
+      const appStateReady = hasLoadedTokenSettings(state) && hasLoadedERC20Settings(state) && hasLoadedLockSettings(state)
       if (!appStateReady) {
         return {
           ...state,
           appStateReady,
         }
       }
+
       const {
         holders,
         claimAmount,
         tokenDecimals,
+        erc20Decimals,
         tokenSupply,
         tokenTransfersEnabled,
+        lockAmounts,
+        tokenIntervals,
       } = state
       const tokenDecimalsBase = new BN(10).pow(new BN(tokenDecimals))
+      const erc20DecimalsBase = new BN(10).pow(new BN(erc20Decimals))
       const ethDecimalsBase = new BN(10).pow(new BN(18))
       return {
         ...state,
         appStateReady,
         tokenDecimalsBase,
+        erc20DecimalsBase,
         ethDecimalsBase,
         // Note that numbers in `numData` are not safe for accurate computations
         // (but are useful for making divisions easier)
@@ -521,15 +425,14 @@ export default observe(
                 ...holder,
                 name: holder.address,
                 balance: (holder.balance ? new BN(holder.balance) : new BN(0)),
-                contribution: (holder.contribution ? new BN(holder.contribution) : new BN(0)),
                 locked: (holder.locked ? new BN(holder.locked) : new BN(0)),
-                claimed: (holder.claimed ? holder.claimed : false)
               }))
-              .filter(({ balance, contribution, claimed }) => balance.gt(new BN('0')) || (contribution.gt(new BN('0')) && !claimed))
+              .filter(({ balance }) => balance.gt(new BN('0')))
               .sort((a, b) => b.balance.cmp(a.balance))
           : [],
         tokenDecimals: new BN(tokenDecimals),
         tokenSupply: new BN(tokenSupply),
+        erc20Decimals: new BN(erc20Decimals),
         claimAmount: new BN(claimAmount),
       }
     }),

@@ -59,9 +59,9 @@ class TokensPanelContent extends React.Component {
       lockIntervals,
       tokenIntervals
     } = this.props
-
     const holderBalance = getHolderBalance(value.trim())
-    const holderClaimed = getHolderClaimed(value.trim())
+    //const holderClaimed = getHolderClaimed(value.trim())
+    const holderClaimed = new BN(0)
     const holderLocked = getHolderLocked(value.trim())
     let items = [];
     if(mode === 'lock'){

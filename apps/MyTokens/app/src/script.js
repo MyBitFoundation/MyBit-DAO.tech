@@ -1,8 +1,12 @@
 import Aragon from '@aragon/client'
 import { of } from './rxjs'
 import tokenSettings, { hasLoadedTokenSettings } from './token-settings'
+import erc20Settings, { hasLoadedERC20Settings } from './erc20-settings'
+import lockSettings, { hasLoadedLockSettings } from './lock-settings'
 import { addressesEqual } from './web3-utils'
 import tokenAbi from './abi/minimeToken.json'
+import erc20Abi from './abi/standardToken.json'
+
 
 const INITIALIZATION_TRIGGER = Symbol('INITIALIZATION_TRIGGER')
 
@@ -38,14 +42,29 @@ const retryEvery = (callback, initialRetryTimer = 1000, increaseFactor = 5) => {
 
 // Get the token address to initialize ourselves
 retryEvery(retry => {
-  let tokenAddress
+  let tokenAddress, erc20Address
 
   app
     .call('token')
     .first()
     .subscribe(
       function(result) {
-        initialize(result)
+        tokenAddress = result
+        app
+          .call('erc20')
+          .first()
+          .subscribe(
+            function(result) {
+              erc20Address = result
+              initialize(tokenAddress, erc20Address)
+            }
+            , err => {
+            console.error(
+              'Could not start background script execution due to the contract not loading the erc20:',
+              err
+            )
+            retry()
+          })
       }
       , err => {
       console.error(
@@ -56,8 +75,9 @@ retryEvery(retry => {
     })
 })
 
-async function initialize(tokenAddr) {
+async function initialize(tokenAddr, erc20Addr) {
   const token = app.external(tokenAddr, tokenAbi)
+  const erc20 = app.external(erc20Addr, erc20Abi)
   try {
     const tokenSymbol = await loadTokenSymbol(token)
     app.identify(tokenSymbol);
@@ -68,11 +88,11 @@ async function initialize(tokenAddr) {
     )
   }
 
-  return createStore(token, tokenAddr)
+  return createStore(token, tokenAddr, erc20, erc20Addr)
 }
 
 // Hook up the script as an aragon.js store
-async function createStore(token, tokenAddr) {
+async function createStore(token, tokenAddr, erc20, erc20Addr) {
   return app.store(
     async (state, { address, event, returnValues }) => {
       let nextState = {
@@ -81,27 +101,22 @@ async function createStore(token, tokenAddr) {
         ...(!hasLoadedTokenSettings(state)
           ? await loadTokenSettings(token)
           : {}),
+        ...(!hasLoadedERC20Settings(state)
+          ? await loadERC20Settings(erc20)
+          : {}),
+        ...(!hasLoadedLockSettings(state)
+          ? await loadLockSettings()
+          : {}),
       }
       if (event === INITIALIZATION_TRIGGER) {
         nextState = {
           ...nextState,
           holders: [],
           tokenAddress: tokenAddr,
-          erc20Address: await loadERC20(),
-        }
-      } else if (addressesEqual(address, tokenAddr)) {
-        switch (event) {
-          case 'Transfer':
-            nextState = await transfer(token, nextState, returnValues)
-            break
-          default:
-            break
+          erc20Address: erc20Addr,
         }
       } else {
         switch (event) {
-          case 'TokenClaimed':
-            nextState = await tokenClaimed(nextState, returnValues)
-            break
           case 'TokensLocked':
             nextState = await tokensLocked(token, nextState, returnValues)
             break
@@ -109,6 +124,7 @@ async function createStore(token, tokenAddr) {
             break
         }
       }
+
       return nextState
     },
     [
@@ -126,52 +142,25 @@ async function createStore(token, tokenAddr) {
  *   Event Handlers    *
  *                     *
  ***********************/
-async function transfer(token, state, { _from, _to, _amount }) {
-  //const changes = await loadNewBalances(token, _from, _to)
-  console.log('Transfer event')
-  let changes;
-  if(_from != "0x0000000000000000000000000000000000000000"){
-    changes = {
-      address : _from,
-      balance : String(-Number(_amount))
-    }
-  } else if(_to != "0x0000000000000000000000000000000000000000"){
-    changes = {
-      address : _to,
-      balance : _amount
-    }
-  }
-  if(changes){
-    // The transfer may have increased the token's total supply, so let's refresh it
-    const tokenSupply = await loadTokenSupply(token)
-    return updateHolderState(
-      {
-        ...state,
-        tokenSupply,
-      },
-      changes
-    )
-  }
-}
-
-async function tokenClaimed(state, { user }) {
-  const changes = {
-    address: user,
-    claimed: true,
-  }
-  return updateClaimedState(
-    { ...state },
-    changes
-  )
-}
-
 async function tokensLocked(token, state, { user, amount }) {
+  const tokenSupply = await loadTokenSupply(token)
+  let balance
+  if(amount > 0){
+    balance = await loadBalance(token, user)
+  } else {
+    balance = '0'
+  }
   const changes = {
     address: user,
     locked: amount,
+    balance: balance,
   }
+
   return updateLockedState(
-    { ...state },
+    {
+      ...state,
+      tokenSupply
+    },
     changes
   )
 }
@@ -182,56 +171,12 @@ async function tokensLocked(token, state, { user, amount }) {
  *                     *
  ***********************/
 
-function updateHolderState(state, changes) {
-  const { holders = [] } = state
-  return {
-    ...state,
-    holders: updateHolders(holders, changes),
-  }
-}
-
-function updateClaimedState(state, changes) {
-  const { holders = [] } = state
-  return {
-    ...state,
-    holders: updateClaims(holders, changes)
-  }
-}
-
 function updateLockedState(state, changes) {
   const { holders = [] } = state
   return {
     ...state,
     holders: updateLockers(holders, changes)
   }
-}
-
-
-function updateHolders(holders, changed) {
-  const holderIndex = holders.findIndex(holder =>
-    addressesEqual(holder.address, changed.address)
-  )
-  if (holderIndex === -1 && changed.balance > 0) {
-    holders.push(changed)
-  } else {
-    if(!holders[holderIndex].balance){
-      holders[holderIndex].balance = '0'
-    }
-    holders[holderIndex].balance = String(Number(holders[holderIndex].balance) + Number(changed.balance))
-  }
-  return holders
-}
-
-function updateClaims(holders, changed) {
-  const claimantIndex = holders.findIndex(claimant =>
-    addressesEqual(claimant.address, changed.address)
-  )
-  if(claimantIndex === -1) {
-    holders.push(changed)
-  } else {
-    holders[claimantIndex].claimed = changed.claimed
-  }
-  return holders
 }
 
 function updateLockers(holders, changed) {
@@ -242,26 +187,9 @@ function updateLockers(holders, changed) {
     holders.push(changed)
   } else {
     holders[lockerIndex].locked = changed.locked
+    holders[lockerIndex].balance = changed.balance
   }
   return holders
-}
-
-function loadERC20() {
-  return new Promise((resolve, reject) =>
-    app
-      .call('erc20')
-      .first()
-      .subscribe(resolve, reject)
-  )
-}
-
-function loadTokenSupply(token) {
-  return new Promise((resolve, reject) =>
-    token
-      .totalSupply()
-      .first()
-      .subscribe(resolve, reject)
-  )
 }
 
 function loadTokenSettings(token) {
@@ -285,6 +213,68 @@ function loadTokenSettings(token) {
       // Return an empty object to try again later
       return {}
     })
+}
+
+function loadERC20Settings(token) {
+  return Promise.all(
+    erc20Settings.map(
+      ([name, key, type = 'string']) =>
+        new Promise((resolve, reject) =>
+          token[name]()
+            .first()
+            .subscribe(value => {
+              resolve({ [key]: value })
+            }, reject)
+        )
+    )
+  ).then(settings =>
+      settings.reduce((acc, setting) => ({ ...acc, ...setting }), {})
+    )
+    .catch(err => {
+      console.error("Failed to load token's settings", err)
+      // Return an empty object to try again later
+      return {}
+    })
+}
+
+function loadLockSettings() {
+  return Promise.all(
+    lockSettings.map(
+      ([name, key, type = 'array']) =>
+        new Promise((resolve, reject) =>
+          app.call(name)
+            .first()
+            .subscribe(value => {
+              resolve({ [key]: value })
+            }, reject)
+        )
+    )
+  ).then(settings =>
+      settings.reduce((acc, setting) => ({ ...acc, ...setting }), {})
+    )
+    .catch(err => {
+      console.error("Failed to load token's settings", err)
+      // Return an empty object to try again later
+      return {}
+    })
+}
+
+function loadBalance(token, address) {
+  return new Promise((resolve, reject) =>
+    token
+      .balanceOf(address)
+      .first()
+      .subscribe(resolve, reject)
+  )
+}
+
+function loadTokenSupply(token) {
+  return new Promise((resolve, reject) =>
+    token
+      .totalSupply()
+      .first()
+      .subscribe(resolve, reject)
+  )
 }
 
 function loadTokenSymbol(token) {
