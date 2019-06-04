@@ -1,0 +1,55 @@
+{
+  "name": "@aragon/mybit-operators",
+  "version": "2.1.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run start:ipfs",
+    "start:ipfs": "aragon run --files ./app/build",
+    "start:http": "aragon run --http localhost:3003 --http-served-from ./app/build",
+    "start:ipfs:template": "npm run start:ipfs -- --template Template --template-init @ARAGON_ENS",
+    "start:http:template": "npm run start:http -- --template Template --template-init @ARAGON_ENS",
+    "compile": "truffle compile",
+    "build": "cd app && npm run build",
+    "apm:publish:major": "aragon apm publish major --files app/build/",
+    "apm:publish:minor": "aragon apm publish minor --files app/build/",
+    "apm:publish:patch": "aragon apm publish patch --files app/build/",
+    "lint": "solium --dir ./contracts",
+    "test": "TRUFFLE_TEST=true npm run ganache-cli:test",
+    "test:gas": "GAS_REPORTER=true npm test",
+    "coverage": "SOLIDITY_COVERAGE=true npm run ganache-cli:test",
+    "truffle:dev": "truffle dev",
+    "ganache-cli:test": "./node_modules/@aragon/test-helpers/ganache-cli.sh",
+    "install:frontend": "cd app && npm install",
+    "abi:extract": "truffle-extract --output abi/ --keys abi",
+    "prepublishOnly": "truffle compile --all && npm run abi:extract -- --no-compile"
+  },
+  "keywords": [],
+  "files": [
+    "/abi",
+    "/arapp.json",
+    "/build",
+    "/contracts",
+    "/test"
+  ],
+  "author": "MyBit",
+  "license": "(GPL-3.0-or-later OR AGPL-3.0-or-later)",
+  "description": "",
+  "devDependencies": {
+    "@aragon/cli": "~5.6.0",
+    "@aragon/test-helpers": "^1.1.0",
+    "eth-gas-reporter": "^0.2.0",
+    "ethereumjs-testrpc-sc": "^6.1.6",
+    "ganache-cli": "^6.4.3",
+    "solidity-coverage": "^0.5.11",
+    "solium": "^1.2.3",
+    "truffle": "4.1.14",
+    "truffle-extract": "^1.2.1"
+  },
+  "dependencies": {
+    "@aragon/apps-shared-minime": "^1.0.1",
+    "@aragon/apps-token-manager": "^2.1.0",
+    "@aragon/apps-vault": "^4.1.0",
+    "@aragon/apps-voting": "^2.1.0",
+    "@aragon/os": "^4.2.0"
+  }
+}

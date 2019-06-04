@@ -3,6 +3,8 @@ build
 apps/MyID/node_modules
 apps/MyTokens/node_modules
 apps/MyTemplate/node_modules
+apps/MyBit-Operators/node_modules
 apps/MyID/build
 apps/MyTokens/build
 apps/MyTemplate/build
+apps/MyBit-Operators/build
