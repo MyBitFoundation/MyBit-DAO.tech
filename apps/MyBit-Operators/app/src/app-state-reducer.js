@@ -1,10 +1,6 @@
 import BN from 'bn.js'
 
-// Convert tokenSupply and holders balances to BNs,
-// and calculate tokenDecimalsBase.
 function appStateReducer(state) {
-
-  console.log(state)
   if (!state) {
     return {
       ...state,
@@ -20,11 +16,19 @@ function appStateReducer(state) {
     isSyncing: false,
     confirmed: operators
       ? operators
-          .filter(({ confirmed, removed }) => (confirmed === true && removed === false))
+          .filter(({ confirmed, removed, failed }) => (confirmed === true && removed === false && failed === false))
       : [],
-    proposed: operators
+    proposals: operators
       ? operators
-          .filter(({ proposed, confirmed, removed }) => (proposed === true && confirmed === false && removed === false))
+          .filter(({ proposed, confirmed, removed, failed }) => (proposed === true && confirmed === false && removed === false && failed === false))
+      : [],
+    requests: operators
+      ? operators
+          .filter(({ proposed, confirmed, removed, failed }) => (proposed === false && confirmed === false && removed === false && failed === false))
+      : [],
+    approved: operators
+      ? operators
+          .filter(({ approved, confirmed, removed, failed }) => (approved === true && confirmed === false && removed === false && failed === false))
       : [],
   }
 }

@@ -79,6 +79,7 @@ contract Template is TemplateBase {
         database.enableContractManagement(address(contractManager));
         operators = new Operators(address(database), address(events));
         contractManager.addContract('Operators', address(operators));
+        contractManager.addContract('Template', address(this));
     }
 
     function newInstance() {
@@ -106,11 +107,12 @@ contract Template is TemplateBase {
         vault.initialize();
         tokenManager.initialize(token, true, 1);
         voting.initialize(token, 50 * PCT, 20 * PCT, 2 minutes);
-        mybitOperators.initialize(address(operators), address(api));
+        mybitOperators.initialize(address(operators), address(api), address(voting));
+        database.setBool(keccak256(abi.encodePacked('owner', address(mybitOperators))), true);
 
         //acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
         //tokenManager.mint(msg.sender, 1); // Give one token to msg.sender
-        acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), msg.sender);
+        acl.createPermission(tokenManager, voting, voting.CREATE_VOTES_ROLE(), voting);
         acl.createPermission(voting, tokenManager, tokenManager.MINT_ROLE(), voting);
         acl.createPermission(voting, vault, vault.TRANSFER_ROLE(), voting);
         acl.createPermission(voting, mybitOperators, mybitOperators.ONBOARD_ROLE(), voting);

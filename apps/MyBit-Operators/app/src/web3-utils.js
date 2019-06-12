@@ -18,4 +18,4 @@ export function bytesEqual(first, second) {
 }
 
 // Re-export some web3-utils functions
-export { isAddress } from 'web3-utils'
+export { isAddress, asciiToHex, padRight } from 'web3-utils'

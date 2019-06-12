@@ -1,8 +1,13 @@
-import Aragon, { events } from '@aragon/api'
-import { bytesEqual } from './web3-utils'
+import '@babel/polyfill'
+import { of } from './rxjs'
+import Aragon from '@aragon/api'
 import eventsAbi from './abi/events.json'
+import votingAbi from './abi/voting.json'
+import BN from 'bn.js'
+import { addressesEqual, asciiToHex, padRight } from './web3-utils'
 
 const app = new Aragon()
+const INITIALIZATION_TRIGGER = Symbol('INITIALIZATION_TRIGGER')
 
 const retryEvery = (callback, initialRetryTimer = 1000, increaseFactor = 5) => {
   const attempt = (retryTimer = initialRetryTimer) => {
@@ -19,7 +24,20 @@ const retryEvery = (callback, initialRetryTimer = 1000, increaseFactor = 5) => {
 
 // Get the token address to initialize ourselves
 retryEvery(retry => {
-  app.call('getEvents').subscribe(initialize, err => {
+  let eventsAddress, votingAddress
+  app.call('getEvents').subscribe(result => {
+    eventsAddress = result
+    app.call('voting').subscribe(result => {
+      votingAddress = result
+      initialize(eventsAddress, votingAddress)
+    }, err => {
+      console.error(
+        'Could not start background script execution due to the contract not loading the voting address:',
+        err
+      )
+      retry()
+    })
+  }, err => {
     console.error(
       'Could not start background script execution due to the contract not loading the events address:',
       err
@@ -28,52 +46,47 @@ retryEvery(retry => {
   })
 })
 
-async function initialize(eventsAddress) {
+async function initialize(eventsAddress, votingAddress) {
   const eventsContract = app.external(eventsAddress, eventsAbi)
+  const votingContract = app.external(votingAddress, votingAbi)
 
-  function reducer(state, { event, returnValues }) {
-    const nextState = {
-      ...state,
-    }
-    console.log('Event: ', event)
-    switch (event) {
-      case events.SYNC_STATUS_SYNCING:
-        return { ...nextState, isSyncing: true }
-      case events.SYNC_STATUS_SYNCED:
-        return { ...nextState, isSyncing: false }
-      case 'NewRequest':
-        return newRequest(nextState, returnValues)
-      /*case 'NewOperator':
-        return newOperator(nextState, returnValues)
-      case 'LogOperator':
-        return operatorEvent(nextState, returnValues)*/
-      default:
-        return nextState
-    }
-  }
-
-  const storeOptions = {
-    externals: [{ contract: eventsContract }],
-    init: initState(),
-  }
-  return app.store(reducer, storeOptions)
+  return app.store(
+    async (state, {address, event, returnValues }) => {
+      let nextState = {
+        ...state,
+      }
+      if(address !== undefined && nextState.thisAddress === undefined && !addressesEqual(address, eventsAddress) && !addressesEqual(address, votingAddress)){
+        nextState = {
+          ...nextState,
+          thisAddress: address
+        }
+      }
+      switch (event) {
+        case INITIALIZATION_TRIGGER:
+          return initState()
+        case 'NewRequest':
+          return newRequest(nextState, returnValues)
+        case 'LogOperator':
+          return operatorEvent(nextState, returnValues)
+        case 'StartVote':
+          return await updateVote(votingContract, nextState, returnValues)
+        default:
+          return nextState
+      }
+    },
+    [
+      // Always initialize the store with our own home-made event
+      of({ event: INITIALIZATION_TRIGGER }),
+      // Merge in the event contract's events into the app's own events for the store
+      eventsContract.events(),
+      votingContract.events()
+    ])
 }
 
 function initState() {
-  return async cachedState => {
-    app.identify('Operators')
-
-    let operators = []
-    if(cachedState && cachedState.operators){
-      operators = cachedState.operators
-    } 
-
-    const initialState = {
-      ...cachedState,
-      operators: operators,
-      isSyncing: true,
-    }
-    return initialState
+  return {
+    operators: [],
+    isSyncing: true,
   }
 }
 
@@ -83,15 +96,11 @@ function initState() {
  *                     *
  ***********************/
 function newRequest(state, { operatorID, name, operatorAddress, referrerAddress, ipfs, assetType }) {
-  console.log('new requests')
   const { operators = [] } = state
-
-  const operatorsIndex = operators.findIndex(operator =>
-    bytesEqual(operator.id, operatorID)
+  const operatorIndex = operators.findIndex(operator =>
+    operator.id.toLowerCase() == operatorID.toLowerCase()
   )
-
   if (operatorIndex === -1) {
-    // If we can't find it, concat
     operators.push({
       id: operatorID,
       name: name,
@@ -101,7 +110,8 @@ function newRequest(state, { operatorID, name, operatorAddress, referrerAddress,
       assetType: assetType,
       proposed: false,
       confirmed: false,
-      removed: false
+      removed: false,
+      failed: false
     })
   } else {
     operators[operatorIndex].address = operatorAddress
@@ -117,15 +127,35 @@ function newRequest(state, { operatorID, name, operatorAddress, referrerAddress,
 }
 
 function operatorEvent(state, { message, messageID, operatorID, operatorURI, account, origin }) {
-  if(message == "Operator removed") {
-    const { operators = [] } = state
+  const { operators = [] } = state
 
-    const operatorsIndex = operators.findIndex(operator =>
+  if(message == 'Operator removed') {
+    const operatorIndex = operators.findIndex(operator =>
       bytesEqual(operator.id, operatorID)
     )
 
     if (operatorIndex !== -1) {
       operators[operatorIndex].removed = true
+    }
+  } else if(message == 'Operator registered'){
+    const operatorIndex = operators.findIndex(operator =>
+      operator.id.toLowerCase() == operatorID.toLowerCase()
+    )
+    if (operatorIndex === -1) {
+      operators.push({
+        id: operatorID,
+        name: operatorURI,
+        address: account,
+        referrer: '0x0000000000000000000000000000000000000000',
+        ipfs: '',
+        assetType: '',
+        proposed: false,
+        confirmed: true,
+        removed: false,
+        failed: false
+      })
+    } else {
+      operators[operatorIndex].confirmed = true
     }
   }
 
@@ -133,4 +163,63 @@ function operatorEvent(state, { message, messageID, operatorID, operatorURI, acc
     ...state,
     operators
   }
+}
+
+async function updateVote(voting, state, { voteId, creator }) {
+  if(state.thisAddress){
+    const { thisAddress, operators = [] } = state
+    const { open, executed, supportRequired, minAcceptQuorum, yea, nay, votingPower, script } = await getVote(voting, voteId)
+    const pctBase = new BN(10).pow(new BN(18))
+    if(script.includes(thisAddress.substr(2).toLowerCase())) {
+      const bytes = `0x${script.slice(194)}`
+      const hexLength = bytes.length-2
+      const operatorIndex = operators.findIndex(operator =>
+        padRight(asciiToHex(operator.name), hexLength) === bytes
+      )
+      if (operatorIndex !== -1) {
+        //Set initiated to true
+        operators[operatorIndex].proposed = true
+        if(open === false && executed === false){
+          const bnYea = new BN(yea)
+          const bnNay = new BN(nay)
+          const bnVotingPower = new BN(votingPower)
+          const bnSupportRequired = new BN(supportRequired)
+          const bnMinQuorum = new BN(minAcceptQuorum)
+          const totalVotes = bnYea.add(bnNay);
+          if (totalVotes.isZero()) {
+            operators[operatorIndex].failed = true
+          } else {
+            const yeaPct = bnYea.mul(pctBase).div(totalVotes)
+            const yeaOfTotalPowerPct = bnYea.mul(pctBase).div(bnVotingPower)
+            // Mirror on-chain calculation
+            // yea / votingPower > supportRequired ||
+            //   (yea / totalVotes > supportRequired &&
+            //    yea / votingPower > minAcceptQuorum)
+            if(yeaOfTotalPowerPct.gt(bnSupportRequired) || (yeaPct.gt(bnSupportRequired) && yeaOfTotalPowerPct.gt(bnMinQuorum))){
+              operators[operatorIndex].approved = true
+            } else {
+              operators[operatorIndex].failed = true
+            }
+          }
+        }
+      }
+      return {
+        ...state,
+        operators
+      }
+    } else {
+      return state
+    }
+  } else {
+    return state
+  }
+}
+
+function getVote(voting, id){
+  return new Promise((resolve, reject) =>
+    voting
+      .getVote(id)
+      .first()
+      .subscribe(resolve, reject)
+  )
 }

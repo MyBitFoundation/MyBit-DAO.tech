@@ -11,87 +11,146 @@ import {
 } from '@aragon/ui'
 import OperatorRow from '../components/OperatorRow'
 
-const TABS = ['Confirmed', 'Proposed']
-
 class Operators extends React.Component {
   static propTypes = {
     operators: PropTypes.array,
   }
   static defaultProps = {
-    operators: [],
+    confirmed: [],
+    proposals: [],
+    requests: [],
+    approved: [],
   }
   state = { selectedTab: 0 }
   render() {
     const {
-      operators,
+      confirmed,
+      proposals,
+      requests,
+      approved,
       userAccount,
+      ipfsURL,
+      onOnboardOperator,
+      onRemoveOperator,
     } = this.props
     const { selectedTab } = this.state
+
+    const items = []
+    if(requests.length > 0) items.push('Requests')
+    if(proposals.length > 0) items.push('Proposals')
+    if(confirmed.length > 0) items.push('Confirmed')
+    if(approved.length > 0) items.push('Awaiting Confirmation...')
 
     return (
       <Viewport>
         {({ below }) => {
           const compactTable = below('medium')
-
           return (
             <Main>
               <TabBarWrapper>
                 <TabBar
-                  items={TABS}
+                  items={items}
                   selected={selectedTab}
-                  onSelect={this.handleSelectTab}
+                  onChange={this.handleSelectTab}
                 />
               </TabBarWrapper>
-              {selectedTab === 0 && (
-                <ResponsiveTable
-                  header={
-                    <TableRow>
-                      <TableHeader
-                        title='Operator'
-                        colSpan={groupMode ? '2' : '1'}
-                      />
-                      {!compactTable && <TableHeader />}
-                    </TableRow>
-                  }
-                  noSideBorders={compactTable}
-                >
-                  {operators.map(({ address, balance }) => (
+              <br/>
+              <ResponsiveTable
+                header={
+                  <TableRow>
+                    <TableHeader
+                      title="Address"
+                    />
+                    <TableHeader
+                      title='Name'
+                    />
+                    <TableHeader
+                      title="Asset Type"
+                    />
+                    <TableHeader
+                      title="Files"
+                    />
+                  </TableRow>
+                }
+                noSideBorders={compactTable}
+              >
+                {items[selectedTab] === 'Requests' && requests.map(({ id, name, address, assetType, ipfs }) => (
                     <OperatorRow
-                      key={address}
+                      key={id}
+                      id={id}
+                      name={name}
                       address={address}
+                      assetType={assetType}
+                      ipfs={ipfs}
+                      ipfsURL={ipfsURL}
                       isCurrentUser={Boolean(
                         userAccount && userAccount === address
                       )}
                       compact={compactTable}
+                      tokenHolder={true}
+                      onOnboardOperator={onOnboardOperator}
+                      onRemoveOperator={false}
                     />
-                  ))}
-                </ResponsiveTable>
-              )}
-              {selectedTab === 1 && (
-                <ResponsiveTable
-                  header={
-                    <TableRow>
-                      <TableHeader
-                        title='Operator'
-                        colSpan={groupMode ? '2' : '1'}
-                      />
-                      {!compactTable && <TableHeader />}
-                    </TableRow>
-                  }
-                  noSideBorders={compactTable}
-                >
-                  {operators.map(({ address, balance }) => (
+                  )
+                )}
+                {items[selectedTab] === 'Proposals' && proposals.map(({ id, name, address, assetType, ipfs }) => (
                     <OperatorRow
-                      key={address}
+                      key={id}
+                      id={id}
+                      name={name}
                       address={address}
+                      assetType={assetType}
+                      ipfs={ipfs}
+                      ipfsURL={ipfsURL}
                       isCurrentUser={Boolean(
                         userAccount && userAccount === address
                       )}
                       compact={compactTable}
+                      tokenHolder={true}
+                      onOnboardOperator={false}
+                      onRemoveOperator={false}
                     />
-                  ))}
-                </ResponsiveTable>
-              )}
+                  )
+                )}
+                {items[selectedTab] === 'Confirmed' && confirmed.map(({ id, name, address, assetType, ipfs }) => (
+                    <OperatorRow
+                      key={id}
+                      id={id}
+                      name={name}
+                      address={address}
+                      assetType={assetType}
+                      ipfs={ipfs}
+                      ipfsURL={ipfsURL}
+                      isCurrentUser={Boolean(
+                        userAccount && userAccount === address
+                      )}
+                      compact={compactTable}
+                      tokenHolder={true}
+                      onOnboardOperator={false}
+                      onRemoveOperator={onRemoveOperator}
+                    />
+                  )
+                )}
+                {items[selectedTab] === 'Awaiting Confirmation...' && approved.map(({ id, name, address, assetType, ipfs }) => (
+                    <OperatorRow
+                      key={id}
+                      id={id}
+                      name={name}
+                      address={address}
+                      assetType={assetType}
+                      ipfs={ipfs}
+                      ipfsURL={ipfsURL}
+                      isCurrentUser={Boolean(
+                        userAccount && userAccount === address
+                      )}
+                      compact={compactTable}
+                      tokenHolder={true}
+                      onOnboardOperator={false}
+                      onRemoveOperator={false}
+                    />
+                  )
+                )}
+              </ResponsiveTable>
             </Main>
           )
         }}
@@ -133,15 +192,6 @@ const Main = styled.div`
     'medium',
     `
       width: 100%;
-    `
-  )};
-`
-const TwoPanels = styled.div`
-  width: 100%;
-  ${breakpoint(
-    'medium',
-    `
-      display: flex;
     `
   )};
 `

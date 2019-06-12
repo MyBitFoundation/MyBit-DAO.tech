@@ -10,53 +10,66 @@ import AssignTokensIcon from './components/AssignTokensIcon'
 import AppLayout from './components/AppLayout'
 import { addressesEqual } from './web3-utils'
 import { IdentityProvider } from './components/IdentityManager/IdentityManager'
+import loadIPFS from './ipfs'
 
 class App extends React.PureComponent {
-  static propTypes = {
-    api: PropTypes.object,
-    isSyncing: PropTypes.bool,
-  }
-
   static defaultProps = {
     appStateReady: false,
     isSyncing: true,
-    operators: [],
     connectedAccount: '',
-    groupMode: false,
   }
 
   state = {
     sidepanelOpened: false,
+    ipfs: null,
+    ipfsURL: 'https://gateway.ipfs.io/ipfs/'
   }
 
-  getHolderBalance = address => {
-    const { holders } = this.props
-    const holder = holders.find(holder =>
-      addressesEqual(holder.address, address)
-    )
-    return holder ? holder.balance : new BN('0')
+  componentDidMount = async () => {
+    loadIPFS.then((response) => {
+      this.setState({
+        ipfs: response.ipfs,
+        ipfsURL: response.ipfsURL
+      })
+    })
   }
 
-  handleNewRequest = ({name, address, referrer, assetType}) => {
+  handleNewRequest = ({name, address, referrer, assetType, bufferArray}) => {
+    const { ipfs } = this.state
     const { api } = this.props
-    const ipfs = 'ipfs'
-    api.newRequest(name, address, referrer, ipfs, assetType)
-       .toPromise()
-       .then(function(tx){
-         console.log(tx)
-       })
+    console.log('Asset Type: ', assetType)
+    if(bufferArray.length > 0){
+      const files = []
+      for(let i=0; i<bufferArray.length; i++){
+        files.push({
+          path: `/folder/${bufferArray[i].name}`,
+          content: bufferArray[i].buffer
+        })
+      }
 
-    this.handleSidepanelClose()
+      ipfs.add(files)
+        .then(results => {
+          const hashIndex = results.findIndex(ipfsObject => ipfsObject.path === "folder")
+          this.handleSidepanelClose()
+          //Save request ot Ethereum (two parts -- submitProof, then requestAuthorization (which goes to a vote))
+          api.newRequest(name, address, referrer, results[hashIndex].hash, assetType)
+             .toPromise()
+        })
+    } else {
+      this.handleSidepanelClose()
+      api.newRequest(name, address, referrer, '', assetType)
+         .toPromise()
+    }
   }
 
-  handleOnboard = operatorID => {
+  handleOnboard = operatorName => {
     const { api } = this.props
-    api.onboardOperator(operatorID).toPromise()
+    api.onboardOperator(operatorName).toPromise()
   }
 
-  handleRemove = operatorID => {
+  handleRemove = operatorName => {
     const { api } = this.props
-    api.revokeOperator(operatorID).toPromise()
+    api.revokeOperator(operatorName).toPromise()
   }
 
   handleSidepanelOpen = () => {
@@ -78,11 +91,15 @@ class App extends React.PureComponent {
     const {
       appStateReady,
       operators,
+      confirmed,
+      proposals,
+      requests,
+      approved,
       isSyncing,
       connectedAccount,
       requestMenu,
     } = this.props
-    const { sidepanelOpened } = this.state
+    const { sidepanelOpened, ipfs, ipfsURL } = this.state
 
     return (
       <Main assetsUrl="./aragon-ui">
@@ -103,10 +120,14 @@ class App extends React.PureComponent {
               }}
               smallViewPadding={0}
             >
-              {appStateReady && operators.length > 0 ? (
+              {appStateReady && (confirmed.length > 0 || proposals.length > 0 || requests.length > 0 || approved.lenght > 0) ? (
                 <Operators
-                  operators={operators}
+                  confirmed={confirmed}
+                  proposals={proposals}
+                  requests={requests}
+                  approved={approved}
                   userAccount={connectedAccount}
+                  ipfsURL={ipfsURL}
                   onOnboardOperator={this.handleOnboard}
                   onRemoveOperator={this.handleRemove}
                 />

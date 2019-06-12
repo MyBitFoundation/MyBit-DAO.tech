@@ -1,9 +1,3 @@
-/*
- * SPDX-License-Identitifer:    GPL-3.0-or-later
- */
-
-/* solium-disable function-order */
-
 pragma solidity 0.4.24;
 
 import "@aragon/os/contracts/apps/AragonApp.sol";
@@ -16,6 +10,7 @@ interface OperatorsInterface {
 
 interface APIInterface {
   function getOperatorAddress(bytes32 _operatorID) external view returns(address);
+  function getOperatorID(address _operatorAddress) external view returns(bytes32);
 }
 
 contract OperatorsWrapper is AragonApp {
@@ -35,6 +30,7 @@ contract OperatorsWrapper is AragonApp {
 
     OperatorsInterface public operators;
     APIInterface public api;
+    address public voting;
 
     event NewRequest(bytes32 operatorID, string name, address operatorAddress, address referrerAddress, string ipfs, string assetType);
     event NewOperator(bytes32 operatorID);
@@ -44,7 +40,8 @@ contract OperatorsWrapper is AragonApp {
     */
     function initialize(
         address _operators,
-        address _api
+        address _api,
+        address _voting
     )
         external
         onlyInit
@@ -52,24 +49,27 @@ contract OperatorsWrapper is AragonApp {
         initialized();
         operators = OperatorsInterface(_operators);
         api = APIInterface(_api);
+        voting = _voting;
     }
 
     /**
-    * @notice Onboard `_operatorID` onto the MyBit Go platform
-    * @param _operatorID The ID of the operator being onboarded
+    * @notice Onboard `_name` onto the MyBit Go platform
+    * @param _name The name of the operator being onboarded
     */
-    function onboardOperator(bytes32 _operatorID) external auth(ONBOARD_ROLE) {
-      require(requests[_operatorID].operator != address(0));
-      operators.registerOperator(requests[_operatorID].operator, requests[_operatorID].name, requests[_operatorID].assetType, requests[_operatorID].referrer);
-      emit NewOperator(_operatorID);
+    function onboardOperator(string _name) external auth(ONBOARD_ROLE) {
+      bytes32 operatorID = keccak256(abi.encodePacked("operator.uri", _name));
+      require(requests[operatorID].operator != address(0));
+      operators.registerOperator(requests[operatorID].operator, requests[operatorID].name, requests[operatorID].assetType, requests[operatorID].referrer);
+      emit NewOperator(operatorID);
     }
 
     /**
-    * @notice Remove `_operatorID` from the MyBit Go platform
-    * @param _operatorID The ID of the operator being removed
+    * @notice Remove `_name` from the MyBit Go platform
+    * @param _name The name of the operator being removed
     */
-    function revokeOperator(bytes32 _operatorID) external auth(ONBOARD_ROLE) {
-      operators.removeOperator(_operatorID);
+    function revokeOperator(string _name) external auth(ONBOARD_ROLE) {
+      bytes32 operatorID = keccak256(abi.encodePacked("operator.uri", _name));
+      operators.removeOperator(operatorID);
     }
 
     /**
@@ -83,6 +83,7 @@ contract OperatorsWrapper is AragonApp {
     function newRequest(string _name, address _operatorAddress, address _referrerAddress, string _ipfs, string _assetType) external {
       bytes32 operatorID = keccak256(abi.encodePacked("operator.uri", _name));
       require(api.getOperatorAddress(operatorID) == address(0));
+      require(api.getOperatorID(_operatorAddress) == bytes32(0))
       requests[operatorID] = Operator(
           _operatorAddress,
           _referrerAddress,
@@ -104,6 +105,4 @@ contract OperatorsWrapper is AragonApp {
     function changeAPIContract(address _newAddress) external auth(MANAGER_ROLE) {
       api = APIInterface(_newAddress);
     }
-
-
 }
