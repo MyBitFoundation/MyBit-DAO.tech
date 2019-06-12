@@ -83,7 +83,7 @@ contract OperatorsWrapper is AragonApp {
     function newRequest(string _name, address _operatorAddress, address _referrerAddress, string _ipfs, string _assetType) external {
       bytes32 operatorID = keccak256(abi.encodePacked("operator.uri", _name));
       require(api.getOperatorAddress(operatorID) == address(0));
-      require(api.getOperatorID(_operatorAddress) == bytes32(0))
+      require(api.getOperatorID(_operatorAddress) == bytes32(0));
       requests[operatorID] = Operator(
           _operatorAddress,
           _referrerAddress,

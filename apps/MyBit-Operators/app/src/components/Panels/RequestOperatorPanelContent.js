@@ -3,32 +3,24 @@ import styled from 'styled-components'
 import { Button, Field, DropDown, IconError, Text, TextInput, Info, theme } from '@aragon/ui'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import { isAddress } from '../../web3-utils'
+import { isEmail, isURL} from 'validator'
 
 const initialState = {
-  nameField: {
-    error: null,
-    warning: null,
-    value: '',
-  },
-  addressField: {
-    error: null,
-    warning: null,
-    value: '',
-  },
-  referrerField: {
-    error: null,
-    warning: null,
-    value: '',
-  },
-  assetField: {
-    error: null,
-    warning: null,
-    value: '',
-  },
-  bufferArray: [],
-  fileList: [],
+  nameField: '',
+  emailField: '',
+  urlField: '',
+  descriptionField: '',
+  addressField: '',
+  referrerField: '',
+  assetField: '',
+  docBufferArray: [],
+  finBufferArray: [],
+  docFileList: [],
+  finFileList: [],
   activeType: 0,
   loading: false,
+  error: null,
+  warning: null,
 }
 
 const assetTypes = [
@@ -64,7 +56,6 @@ class RequestOperatorPanelContent extends React.Component {
 
   //Convert the file to buffer to store on IPFS
   convertToBuffer = async(reader) => {
-    const { bufferArray } = this.state
     //file is converted to a buffer for upload to IPFS
     const buffer = await Buffer.from(reader.result);
     //set this buffer-using es6 syntax
@@ -76,37 +67,51 @@ class RequestOperatorPanelContent extends React.Component {
   }
 
   handleNameChange = event => {
-    const { nameField } = this.state
     this.setState({
-      nameField: { ...nameField, value: event.target.value}
+      nameField: event.target.value
+    })
+  }
+
+  handleEmailChange = event => {
+    this.setState({
+      emailField: event.target.value
+    })
+  }
+
+  handleURLChange = event => {
+    this.setState({
+      urlField: event.target.value
+    })
+  }
+
+  handleDescriptionChange = event => {
+    this.setState({
+      descriptionField: event.target.value
     })
   }
 
   handleAddressChange = event => {
-    const {addressField } = this.state
     this.setState({
-      addressField: { ...addressField, value: event.target.value}
+      addressField: event.target.value
     })
   }
 
   handleReferrerChange = event => {
-    const { referrerField } = this.state
     this.setState({
-      referrerField: { ...referrerField, value: event.target.value}
+      referrerField: event.target.value
     })
   }
 
   handleAssetChange = index => {
-    const { assetField } = this.state
     this.setState({
       activeType: index
     })
   }
 
   //Take file input from user
-  handleFileChange = event => {
-    const fileList = []
-    const bufferArray = []
+  handleDocFileChange = event => {
+    const docFileList = []
+    const docBufferArray = []
     event.stopPropagation()
     event.preventDefault()
     for(let i=0; i<event.target.files.length; i++){
@@ -115,78 +120,129 @@ class RequestOperatorPanelContent extends React.Component {
       reader.readAsArrayBuffer(file)
       reader.onloadend = () => {
         this.convertToBuffer(reader).then(buffer => {
-          bufferArray.push({
+          docBufferArray.push({
             name:file.name,
             buffer: buffer
           })
         })
       }
-      fileList.push(file)
+      docFileList.push(file)
     }
     this.setState({
-      fileList,
-      bufferArray
+      docFileList,
+      docBufferArray
     })
+  };
 
+  //Take file input from user
+  handleFinFileChange = event => {
+    const finFileList = []
+    const finBufferArray = []
+    event.stopPropagation()
+    event.preventDefault()
+    for(let i=0; i<event.target.files.length; i++){
+      const file = event.target.files[i]
+      const reader = new window.FileReader()
+      reader.readAsArrayBuffer(file)
+      reader.onloadend = () => {
+        this.convertToBuffer(reader).then(buffer => {
+          finBufferArray.push({
+            name:file.name,
+            buffer: buffer
+          })
+        })
+      }
+      finFileList.push(file)
+    }
+    this.setState({
+      finFileList,
+      finBufferArray
+    })
   };
 
   handleSubmit = event => {
     event.preventDefault()
-    const { nameField, addressField, referrerField, activeType, bufferArray } = this.state
-    const operatorAddress = this.filteredAddress(addressField.value)
-    const referrerAddress = this.filteredAddress(referrerField.value)
-    let operatorError, referrerError
+    const { nameField, emailField, urlField, descriptionField, addressField, referrerField, activeType, docBufferArray, finBufferArray } = this.state
+    const operatorAddress = this.filteredAddress(addressField)
+    const referrerAddress = this.filteredAddress(referrerField)
+    let error
+    console.log(docBufferArray)
+    console.log(finBufferArray)
 
-    operatorError = !isAddress(operatorAddress)
+    error = !isAddress(operatorAddress)
       ? "Operator address must be a valid Ethereum address"
       : null
 
-    referrerError = (referrerAddress != '' && !isAddress(referrerAddress))
+    error = (referrerAddress != '' && !isAddress(referrerAddress))
       ? "Referrer address must be a valid Ethereum address"
-      : null
+      : error
 
-    referrerError = (operatorAddress.toLowerCase() == referrerAddress.toLowerCase())
+    error = (operatorAddress.toLowerCase() == referrerAddress.toLowerCase())
       ? "The operator cannot refer themselves"
-      : referrerError
+      : error
+
+    error = (urlField != '' && !isURL(urlField))
+      ? "Website invalid"
+      : error
+
+    error = (!isEmail(emailField))
+      ? "Email invalid"
+      : error
 
     // Error
-    if (operatorError) {
-      this.setState(({ addressField }) => ({
-        addressField: { ...addressField, error: operatorError },
-      }))
-      return
-    }
-
-    // Error
-    if (referrerError) {
-      this.setState(({ referrerField }) => ({
-        referrerField: { ...referrerField, error: referrerError },
-      }))
+    if (error) {
+      this.setState({
+        error: error
+      })
       return
     }
 
     this.setState({loading: true})
 
-    // Update tokens
     this.props.submitOperator({
-      name: nameField.value,
+      name: nameField,
+      email: emailField,
+      url: urlField,
+      description: descriptionField,
       address: operatorAddress,
       referrer: referrerAddress,
       assetType: assetTypes[activeType],
-      bufferArray: bufferArray
+      docBufferArray: docBufferArray,
+      finBufferArray: finBufferArray
     })
   }
 
   render() {
-    const { nameField, addressField, referrerField, assetField, fileList, loading } = this.state
+    const {
+      nameField,
+      emailField,
+      urlField,
+      descriptionField,
+      addressField,
+      referrerField,
+      assetField,
+      docFileList,
+      finFileList,
+      loading,
+      error,
+      warning
+    } = this.state
 
     const errorMessage = addressField.error || referrerField.error
     const warningMessage = addressField.warning || referrerField.warning
 
-    let fileListHTML = []
-    if(fileList.length > 1){
-      fileList.forEach(function (file){
-        fileListHTML.push(<li>{file.name}</li>)
+    let docFileListHTML = "No files uploaded"
+    let finFileListHTML = "No files uploaded"
+    if(docFileList.length > 0){
+      docFileListHTML = []
+      docFileList.forEach(function (file){
+        docFileListHTML.push(<li>{file.name}</li>)
+      })
+    }
+    if(finFileList.length > 0){
+      finFileListHTML = []
+      finFileList.forEach(function (file){
+        finFileListHTML.push(<li>{file.name}</li>)
       })
     }
 
@@ -199,14 +255,48 @@ class RequestOperatorPanelContent extends React.Component {
           />
 
           <Field
-            label="Operator Name"
+            label="Legal Name"
           >
             <TextInput
               ref={this._nameInput}
-              value={nameField.value}
+              value={nameField}
               onChange={this.handleNameChange}
               wide
               required
+            />
+          </Field>
+
+          <Field
+            label="Email"
+          >
+            <TextInput
+              ref={this._emailInput}
+              value={emailField}
+              onChange={this.handleEmailChange}
+              wide
+              required
+            />
+          </Field>
+
+          <Field
+            label="Website"
+          >
+            <TextInput
+              ref={this._urlInput}
+              value={urlField}
+              onChange={this.handleURLChange}
+              wide
+            />
+          </Field>
+
+          <Field
+            label='Description'
+          >
+            <TextArea
+              ref={this._descriptionInput}
+              value={descriptionField}
+              onChange={this.handleDescriptionChange}
+              wide
             />
           </Field>
 
@@ -218,7 +308,7 @@ class RequestOperatorPanelContent extends React.Component {
           >
             <TextInput
               ref={this._addressInput}
-              value={addressField.value}
+              value={addressField}
               onChange={this.handleAddressChange}
               wide
               required
@@ -233,7 +323,7 @@ class RequestOperatorPanelContent extends React.Component {
           >
             <TextInput
               ref={this._referrerInput}
-              value={referrerField.value}
+              value={referrerField}
               onChange={this.handleReferrerChange}
               wide
             />
@@ -250,19 +340,27 @@ class RequestOperatorPanelContent extends React.Component {
               required
             />
           </Field>
-          <Field
-            label='Upload Documents'
-          >
-            <input
-              type = "file"
-              onChange = {this.handleFileChange}
-              multiple
+          <Field>
+            <FileInput
+              message = 'Upload Legal Documents'
+              mode = 'secondary'
+              onChange = {this.handleDocFileChange}
+              multiple = 'true'
             />
-            {(fileList.length > 1) && (
-              <FileList>
-                {fileListHTML}
-              </FileList>
-            )}
+            <FileList>
+              {docFileListHTML}
+            </FileList>
+          </Field>
+          <Field>
+            <FileInput
+              message = 'Upload Financial Statements'
+              mode = 'secondary'
+              onChange = {this.handleFinFileChange}
+              multiple = 'true'
+            />
+            <FileList>
+              {finFileListHTML}
+            </FileList>
 
           </Field>
           {loading ? (
@@ -287,6 +385,38 @@ class RequestOperatorPanelContent extends React.Component {
     )
   }
 }
+
+const TextArea = styled.textarea`
+  width:100%;
+  max-width:100%;
+  min-width:100%;
+  height:100px;
+  min-height:33px;
+  padding:5px 10px;
+  border: 1px solid rgba(209, 209, 209, 0.5);
+  border-radius: 3px;
+  &:focus {
+    outline: none;
+    border-color: ${theme.contentBorderActive};
+  }
+`
+
+const FileInput = ({ multiple, message, mode, onChange }) => (
+  <div style={{ width:'100%', position: 'relative', overflow: 'hidden', display: 'inline-block'}}>
+    <Button
+      mode={mode}
+      wide
+    >
+      {message}
+    </Button>
+    <input
+      type="file"
+      onChange={onChange}
+      multiple={multiple}
+      style={{fontSize: '100px', position: 'absolute', left: '0', top: '0', opacity: '0'}}
+    />
+  </div>
+)
 
 const Message = styled.div`
   & + & {
@@ -317,10 +447,15 @@ const ErrorMessage = ({ message }) => (
 
 const FileList = styled.ul`
   list-style-position: inside;
-  margin-top:5px;
+  margin-top:0px;
   padding:10px;
+  font-style: italic;
+  color:${theme.textSecondary};
   background-color:${theme.infoBackground};
   border-radius:5px;
+  & li {
+    font-style: normal;
+  }
 `
 
 const Spinner = () => (

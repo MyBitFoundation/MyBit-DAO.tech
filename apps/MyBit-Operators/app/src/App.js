@@ -11,6 +11,7 @@ import AppLayout from './components/AppLayout'
 import { addressesEqual } from './web3-utils'
 import { IdentityProvider } from './components/IdentityManager/IdentityManager'
 import loadIPFS from './ipfs'
+import { Buffer } from 'ipfs-http-client'
 
 class App extends React.PureComponent {
   static defaultProps = {
@@ -34,32 +35,51 @@ class App extends React.PureComponent {
     })
   }
 
-  handleNewRequest = ({name, address, referrer, assetType, bufferArray}) => {
+  handleNewRequest = ({name, email, url, description, address, referrer, assetType, docBufferArray, finBufferArray}) => {
     const { ipfs } = this.state
     const { api } = this.props
     console.log('Asset Type: ', assetType)
-    if(bufferArray.length > 0){
-      const files = []
-      for(let i=0; i<bufferArray.length; i++){
+    console.log(ipfs)
+    const files = []
+    if(docBufferArray.length > 0){
+      for(let i=0; i<docBufferArray.length; i++){
         files.push({
-          path: `/folder/${bufferArray[i].name}`,
-          content: bufferArray[i].buffer
+          path: `/folder/Documents/${docBufferArray[i].name}`,
+          content: docBufferArray[i].buffer
         })
       }
-
-      ipfs.add(files)
-        .then(results => {
-          const hashIndex = results.findIndex(ipfsObject => ipfsObject.path === "folder")
-          this.handleSidepanelClose()
-          //Save request ot Ethereum (two parts -- submitProof, then requestAuthorization (which goes to a vote))
-          api.newRequest(name, address, referrer, results[hashIndex].hash, assetType)
-             .toPromise()
-        })
-    } else {
-      this.handleSidepanelClose()
-      api.newRequest(name, address, referrer, '', assetType)
-         .toPromise()
     }
+    if(finBufferArray.length > 0){
+      for(let i=0; i<finBufferArray.length; i++){
+        files.push({
+          path: `/folder/Finances/${finBufferArray[i].name}`,
+          content: finBufferArray[i].buffer
+        })
+      }
+    }
+    //Generate json file
+    const json = JSON.stringify({
+      name: name,
+      email: email,
+      url: url,
+      description: description,
+      address: address,
+      referrer: referrer
+    }, null, 4)
+
+    files.push({
+      path: 'folder/profile.json',
+      content: Buffer.from(json)
+    })
+
+    ipfs.add(files)
+      .then(results => {
+        const hashIndex = results.findIndex(ipfsObject => ipfsObject.path === "folder")
+        this.handleSidepanelClose()
+        //Save request ot Ethereum (two parts -- submitProof, then requestAuthorization (which goes to a vote))
+        api.newRequest(name, address, referrer, results[hashIndex].hash, assetType)
+           .toPromise()
+      })
   }
 
   handleOnboard = operatorName => {
