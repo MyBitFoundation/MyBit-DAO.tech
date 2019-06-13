@@ -12,25 +12,14 @@ const initialState = {
   descriptionField: '',
   addressField: '',
   referrerField: '',
-  assetField: '',
   docBufferArray: [],
   finBufferArray: [],
   docFileList: [],
   finFileList: [],
-  activeType: 0,
   loading: false,
   error: null,
   warning: null,
 }
-
-const assetTypes = [
-  'Bitcoin ATM',
-  'Co-Working Space',
-  'Ethereum Miner',
-  'Home Solar System',
-  'Smart Bench',
-  'Storage Unit'
-]
 
 class RequestOperatorPanelContent extends React.Component {
   static defaultProps = {
@@ -102,12 +91,6 @@ class RequestOperatorPanelContent extends React.Component {
     })
   }
 
-  handleAssetChange = index => {
-    this.setState({
-      activeType: index
-    })
-  }
-
   //Take file input from user
   handleDocFileChange = event => {
     const docFileList = []
@@ -162,12 +145,10 @@ class RequestOperatorPanelContent extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault()
-    const { nameField, emailField, urlField, descriptionField, addressField, referrerField, activeType, docBufferArray, finBufferArray } = this.state
+    const { nameField, emailField, urlField, descriptionField, addressField, referrerField, docBufferArray, finBufferArray } = this.state
     const operatorAddress = this.filteredAddress(addressField)
     const referrerAddress = this.filteredAddress(referrerField)
     let error
-    console.log(docBufferArray)
-    console.log(finBufferArray)
 
     error = !isAddress(operatorAddress)
       ? "Operator address must be a valid Ethereum address"
@@ -206,7 +187,6 @@ class RequestOperatorPanelContent extends React.Component {
       description: descriptionField,
       address: operatorAddress,
       referrer: referrerAddress,
-      assetType: assetTypes[activeType],
       docBufferArray: docBufferArray,
       finBufferArray: finBufferArray
     })
@@ -228,21 +208,19 @@ class RequestOperatorPanelContent extends React.Component {
       warning
     } = this.state
 
-    const errorMessage = addressField.error || referrerField.error
-    const warningMessage = addressField.warning || referrerField.warning
-
     let docFileListHTML = "No files uploaded"
     let finFileListHTML = "No files uploaded"
     if(docFileList.length > 0){
       docFileListHTML = []
-      docFileList.forEach(function (file){
-        docFileListHTML.push(<li>{file.name}</li>)
+      docFileList.forEach(function (file, index){
+        console.log('Index: ', index)
+        docFileListHTML.push(<li key={index}>{file.name}</li>)
       })
     }
     if(finFileList.length > 0){
       finFileListHTML = []
-      finFileList.forEach(function (file){
-        finFileListHTML.push(<li>{file.name}</li>)
+      finFileList.forEach(function (file, index){
+        finFileListHTML.push(<li key={index}>{file.name}</li>)
       })
     }
 
@@ -328,24 +306,12 @@ class RequestOperatorPanelContent extends React.Component {
               wide
             />
           </Field>
-
-          <Field
-            label="Asset Type"
-          >
-            <DropDown
-              items={assetTypes}
-              active={this.state.activeType}
-              onChange={this.handleAssetChange}
-              wide
-              required
-            />
-          </Field>
           <Field>
             <FileInput
-              message = 'Upload Legal Documents'
-              mode = 'secondary'
-              onChange = {this.handleDocFileChange}
-              multiple = 'true'
+              message='Upload Legal Documents'
+              mode='secondary'
+              onChange={this.handleDocFileChange}
+              multiple={true}
             />
             <FileList>
               {docFileListHTML}
@@ -353,10 +319,10 @@ class RequestOperatorPanelContent extends React.Component {
           </Field>
           <Field>
             <FileInput
-              message = 'Upload Financial Statements'
-              mode = 'secondary'
-              onChange = {this.handleFinFileChange}
-              multiple = 'true'
+              message='Upload Financial Statements'
+              mode='secondary'
+              onChange={this.handleFinFileChange}
+              multiple={true}
             />
             <FileList>
               {finFileListHTML}
@@ -377,8 +343,8 @@ class RequestOperatorPanelContent extends React.Component {
             </Button>
           )}
           <div css="margin-top: 15px">
-            {errorMessage && <ErrorMessage message={errorMessage} />}
-            {warningMessage && <WarningMessage message={warningMessage} />}
+            {error && <ErrorMessage message={error} />}
+            {warning && <WarningMessage message={warning} />}
           </div>
         </form>
       </div>

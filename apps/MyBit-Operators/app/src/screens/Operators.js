@@ -65,22 +65,18 @@ class Operators extends React.Component {
                       title='Name'
                     />
                     <TableHeader
-                      title="Asset Type"
-                    />
-                    <TableHeader
                       title="Files"
                     />
                   </TableRow>
                 }
                 noSideBorders={compactTable}
               >
-                {items[selectedTab] === 'Requests' && requests.map(({ id, name, address, assetType, ipfs }) => (
+                {items[selectedTab] === 'Requests' && requests.map(({ id, name, address, ipfs }) => (
                     <OperatorRow
                       key={id}
                       id={id}
                       name={name}
                       address={address}
-                      assetType={assetType}
                       ipfs={ipfs}
                       ipfsURL={ipfsURL}
                       isCurrentUser={Boolean(
@@ -93,13 +89,12 @@ class Operators extends React.Component {
                     />
                   )
                 )}
-                {items[selectedTab] === 'Proposals' && proposals.map(({ id, name, address, assetType, ipfs }) => (
+                {items[selectedTab] === 'Proposals' && proposals.map(({ id, name, address, ipfs }) => (
                     <OperatorRow
                       key={id}
                       id={id}
                       name={name}
                       address={address}
-                      assetType={assetType}
                       ipfs={ipfs}
                       ipfsURL={ipfsURL}
                       isCurrentUser={Boolean(
@@ -112,13 +107,12 @@ class Operators extends React.Component {
                     />
                   )
                 )}
-                {items[selectedTab] === 'Confirmed' && confirmed.map(({ id, name, address, assetType, ipfs }) => (
+                {items[selectedTab] === 'Confirmed' && confirmed.map(({ id, name, address, ipfs }) => (
                     <OperatorRow
                       key={id}
                       id={id}
                       name={name}
                       address={address}
-                      assetType={assetType}
                       ipfs={ipfs}
                       ipfsURL={ipfsURL}
                       isCurrentUser={Boolean(
@@ -131,13 +125,12 @@ class Operators extends React.Component {
                     />
                   )
                 )}
-                {items[selectedTab] === 'Awaiting Confirmation...' && approved.map(({ id, name, address, assetType, ipfs }) => (
+                {items[selectedTab] === 'Awaiting Confirmation...' && approved.map(({ id, name, address, ipfs }) => (
                     <OperatorRow
                       key={id}
                       id={id}
                       name={name}
                       address={address}
-                      assetType={assetType}
                       ipfs={ipfs}
                       ipfsURL={ipfsURL}
                       isCurrentUser={Boolean(

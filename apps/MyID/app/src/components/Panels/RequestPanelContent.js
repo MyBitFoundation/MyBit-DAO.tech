@@ -319,8 +319,9 @@ const Messages = styled.div`
 const WarningMessage = ({ message }) => <Info.Action>{message}</Info.Action>
 
 const ErrorMessage = ({ message }) => (
-  <Info background="rgba(251,121,121,0.06)"><IconError />
-    <Text size="small" style={{ marginLeft: '10px' }}>
+  <Info background="rgba(251,121,121,0.06)">
+    <IconError style={{ verticalAlign: 'middle'}}/>
+    <Text size="small" style={{ marginLeft: '10px'}}>
       {message}
     </Text>
   </Info>

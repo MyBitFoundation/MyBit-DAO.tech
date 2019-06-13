@@ -22,7 +22,6 @@ const OperatorRow = React.memo(
     id,
     name,
     address,
-    assetType,
     ipfs,
     ipfsURL,
     isCurrentUser,
@@ -53,9 +52,6 @@ const OperatorRow = React.memo(
         </TableCell>
         <TableCell css="padding-right: 0">
             {name}
-        </TableCell>
-        <TableCell>
-            {assetType}
         </TableCell>
         <TableCell>
           <Truncate>

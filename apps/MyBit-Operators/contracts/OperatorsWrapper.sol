@@ -4,7 +4,7 @@ import "@aragon/os/contracts/apps/AragonApp.sol";
 
 interface OperatorsInterface {
   function events() external view returns(address);
-  function registerOperator(address _operatorAddress, string _operatorURI, string _assetType, address _referrerAddress) external;
+  function registerOperator(address _operatorAddress, string _operatorURI, string _ipfs, address _referrerAddress) external;
   function removeOperator(bytes32 _operatorID) external;
 }
 
@@ -22,7 +22,6 @@ contract OperatorsWrapper is AragonApp {
         address operator;
         address referrer;
         string name;
-        string assetType;
         string ipfs;
     }
 
@@ -32,7 +31,7 @@ contract OperatorsWrapper is AragonApp {
     APIInterface public api;
     address public voting;
 
-    event NewRequest(bytes32 operatorID, string name, address operatorAddress, address referrerAddress, string ipfs, string assetType);
+    event NewRequest(bytes32 operatorID, string name, address operatorAddress, address referrerAddress, string ipfs);
     event NewOperator(bytes32 operatorID);
 
     /**
@@ -59,7 +58,7 @@ contract OperatorsWrapper is AragonApp {
     function onboardOperator(string _name) external auth(ONBOARD_ROLE) {
       bytes32 operatorID = keccak256(abi.encodePacked("operator.uri", _name));
       require(requests[operatorID].operator != address(0));
-      operators.registerOperator(requests[operatorID].operator, requests[operatorID].name, requests[operatorID].assetType, requests[operatorID].referrer);
+      operators.registerOperator(requests[operatorID].operator, requests[operatorID].name, requests[operatorID].ipfs, requests[operatorID].referrer);
       emit NewOperator(operatorID);
     }
 
@@ -78,9 +77,8 @@ contract OperatorsWrapper is AragonApp {
     * @param  _operatorAddress The address of the operator
     * @param _referrerAddress The address of the user who has referred the operator
     * @param _ipfs The ipfs address of supporting documents
-    * @param _assetType The type of asset
     */
-    function newRequest(string _name, address _operatorAddress, address _referrerAddress, string _ipfs, string _assetType) external {
+    function newRequest(string _name, address _operatorAddress, address _referrerAddress, string _ipfs) external {
       bytes32 operatorID = keccak256(abi.encodePacked("operator.uri", _name));
       require(api.getOperatorAddress(operatorID) == address(0));
       require(api.getOperatorID(_operatorAddress) == bytes32(0));
@@ -88,10 +86,9 @@ contract OperatorsWrapper is AragonApp {
           _operatorAddress,
           _referrerAddress,
           _name,
-          _assetType,
           _ipfs
       );
-      emit NewRequest(operatorID, _name, _operatorAddress, _referrerAddress, _ipfs, _assetType);
+      emit NewRequest(operatorID, _name, _operatorAddress, _referrerAddress, _ipfs);
     }
 
     function getEvents() external view returns (address){

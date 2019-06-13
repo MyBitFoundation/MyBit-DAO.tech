@@ -1,5 +1,5 @@
 {
-  "name": "@aragon/mybit-operators",
+  "name": "mybit-operators-templates",
   "version": "2.1.0",
   "main": "index.js",
   "scripts": {
