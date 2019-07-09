@@ -1,0 +1,9 @@
+{
+  "name": "MyAsset",
+  "description": "Manage an asset created in MyBit Go",
+  "icons": [
+    { "src": "/images/icon.svg", "sizes": "56x56" }
+  ],
+  "script": "/script.js",
+  "start_url": "/index.html"
+}
