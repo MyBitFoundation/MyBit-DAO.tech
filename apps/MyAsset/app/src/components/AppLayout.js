@@ -12,6 +12,7 @@ const AppLayout = ({
   smallViewPadding,
   largeViewPadding,
   mainButton,
+  secondaryButton,
 }) => {
   const { requestMenu, displayMenuButton } = useAragonApi()
   return (
@@ -35,6 +36,31 @@ const AppLayout = ({
                   </TitleLabel>
                   {afterTitle}
                 </Title>
+                {secondaryButton &&
+                  (below('medium') ? (
+                    <ButtonIcon
+                      onClick={secondaryButton.onClick}
+                      label={secondaryButton.label}
+                      css={`
+                        width: auto;
+                        height: 100%;
+                        padding: 0 10px;
+                        margin-left: 8px;
+                      `}
+                    >
+                      {secondaryButton.icon}
+                    </ButtonIcon>
+                  ) : (
+                    <Button
+                      mode="secondary"
+                      onClick={secondaryButton.onClick}
+                      css={`
+                        margin-right: 8px;
+                      `}
+                    >
+                      {secondaryButton.label}
+                    </Button>
+                  ))}
                 {mainButton &&
                   (below('medium') ? (
                     <ButtonIcon

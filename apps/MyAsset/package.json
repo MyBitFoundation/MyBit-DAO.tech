@@ -35,11 +35,11 @@
   "license": "(GPL-3.0-or-later OR AGPL-3.0-or-later)",
   "description": "",
   "devDependencies": {
-    "@aragon/cli": "~5.6.0",
+    "@aragon/cli": "^5.6.0",
     "@aragon/test-helpers": "^1.1.0",
     "eth-gas-reporter": "^0.2.0",
     "ethereumjs-testrpc-sc": "^6.1.6",
-    "ganache-cli": "^6.4.3",
+    "ganache-cli": "6.4.3",
     "solidity-coverage": "^0.5.11",
     "solium": "^1.2.3",
     "truffle": "4.1.14",
@@ -49,6 +49,6 @@
     "@aragon/apps-shared-minime": "^1.0.1",
     "@aragon/apps-vault": "^4.1.0",
     "@aragon/apps-voting": "^2.1.0",
-    "@aragon/os": "4.0.1"
+    "@aragon/os": "^4.2.1"
   }
 }

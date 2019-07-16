@@ -10,7 +10,7 @@ function appStateReducer(state) {
 
   const { operators } = state
 
-  return {
+  const newState = {
     ...state,
     appStateReady: true,
     isSyncing: false,
@@ -20,7 +20,7 @@ function appStateReducer(state) {
       : [],
     proposals: operators
       ? operators
-          .filter(({ proposed, confirmed, removed, failed }) => (proposed === true && confirmed === false && removed === false && failed === false))
+          .filter(({ approved, proposed, confirmed, removed, failed }) => (approved === false && proposed === true && confirmed === false && removed === false && failed === false))
       : [],
     requests: operators
       ? operators
@@ -31,6 +31,7 @@ function appStateReducer(state) {
           .filter(({ approved, confirmed, removed, failed }) => (approved === true && confirmed === false && removed === false && failed === false))
       : [],
   }
+  return newState
 }
 
 export default appStateReducer

@@ -26,7 +26,7 @@ class RequestFundsPanelContent extends React.Component {
   state = {
     ...initialState,
   }
-  _holderInput = React.createRef()
+  _amountInput = React.createRef()
   componentWillReceiveProps({ opened, userAccount }) {
     if (opened && !this.props.opened) {
       // setTimeout is needed as a small hack to wait until the input is

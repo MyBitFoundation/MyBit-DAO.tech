@@ -9,6 +9,8 @@ import ChangePanelContent from './components/Panels/ChangePanelContent'
 import ContributePanelContent from './components/Panels/ContributePanelContent'
 import RequestFundsPanelContent from './components/Panels/RequestFundsPanelContent'
 import AssignTokensIcon from './components/AssignTokensIcon'
+import FundingIcon from './components/FundingIcon'
+import BurnIcon from './components/BurnIcon'
 import AppLayout from './components/AppLayout'
 import { addressesEqual } from './web3-utils'
 import { IdentityProvider } from './components/IdentityManager/IdentityManager'
@@ -28,6 +30,7 @@ class App extends React.PureComponent {
   }
   static defaultProps = {
     appStateReady: false,
+    escrowRemaining: new BN(0),
     isSyncing: false,
     holders: [],
     connectedAccount: '',
@@ -103,6 +106,10 @@ class App extends React.PureComponent {
     const { api } = this.props
     api.startFunding(requestID).toPromise()
   }
+  handleBurn = () => {
+    const { api } = this.props
+    api.burnEscrow().toPromise()
+  }
   launchChangePanel = () => {
     this.setState({
       mode: 'change',
@@ -137,11 +144,14 @@ class App extends React.PureComponent {
       appStateReady,
       assetManager,
       connectedAccount,
+      collateralSymbol,
+      collateralDecimalsBase,
       erc20Address,
       erc20DecimalsBase,
       erc20Name,
       erc20Symbol,
       escrowContract,
+      escrowRemaining,
       requests,
       proposals,
       approved,
@@ -163,7 +173,6 @@ class App extends React.PureComponent {
     } = this.props
 
     const { mode, proposedManager, sidepanelOpened, ipfs, ipfsURL } = this.state
-
     return (
       <Main assetsUrl="./aragon-ui">
         <div css="min-width: 320px">
@@ -182,15 +191,24 @@ class App extends React.PureComponent {
                   onClick: this.launchChangePanel,
                 }) : ({
                   label: 'Request Funding',
-                  icon: <AssignTokensIcon />,
+                  icon: <FundingIcon />,
                   onClick: this.launchRequestFundsPanel,
                 })
+              }
+              secondaryButton={(assetManager !== connectedAccount && escrowRemaining.gt(new BN(0))) ? ({
+                  label: 'Burn Collateral',
+                  icon: <BurnIcon />,
+                  onClick: this.handleBurn,
+                }) : (null)
               }
               smallViewPadding={0}
             >
               {appStateReady && holders.length > 0 ? (
                 <Holders
                   assetManager={assetManager}
+                  collateralSymbol={collateralSymbol}
+                  collateralDecimalsBase={collateralDecimalsBase}
+                  escrowRemaining={escrowRemaining}
                   holders={holders}
                   holdingContract={holdingContract}
                   requests={requests}

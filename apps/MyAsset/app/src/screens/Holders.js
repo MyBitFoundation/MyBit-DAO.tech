@@ -29,6 +29,9 @@ class Holders extends React.Component {
   render() {
     const {
       assetManager,
+      collateralSymbol,
+      collateralDecimalsBase,
+      escrowRemaining,
       holders,
       holdingContract,
       requests,
@@ -245,6 +248,9 @@ class Holders extends React.Component {
               {(!tabbedNavigation || selectedTab === 1) && (
                 <SideBar
                   assetManager={assetManager}
+                  collateralSymbol={collateralSymbol}
+                  collateralDecimalsBase={collateralDecimalsBase}
+                  escrowRemaining={escrowRemaining}
                   holders={holders}
                   isCurrentUser={Boolean(
                     userAccount && userAccount === assetManager
@@ -253,7 +259,6 @@ class Holders extends React.Component {
                   fundingProgress={fundingProgress}
                   tokenAddress={tokenAddress}
                   tokenDecimalsBase={tokenDecimalsBase}
-                  tokenName={tokenName}
                   tokenSupply={tokenSupply}
                   tokenSymbol={tokenSymbol}
                   tokenIncome={tokenIncome}

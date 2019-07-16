@@ -1,5 +1,9 @@
 #MyID
 ## Mainnet Deployment
+### myid.open.aragonpm.eth v1.0.4:
+ - Content (ipfs): QmZzivAvguWgpueMgTDfnkRHmuRmtRZyBwJfz2VwVesB9d
+ - Transaction hash: 0x1e750c91271241e4b1f3e15df853506ef968532721416fca94d8fde23d4d10d3
+
 ### myid.open.aragonpm.eth v1.0.3:
  - Content (ipfs): QmViCJNe8GiHmBqZTBcomGWMYnRS8cf3GEyw7PWKzsFkEs
  - Transaction hash: 0x12dc79d11854f0a532b469d932784647bfc5c75ae57913204e1ac0187d73c8b7
@@ -18,6 +22,10 @@
  - Transaction hash: 0xbb9d0639beb14587da138128252b2a44ae5e2efee1963e486a8c1d755dbf0e44
 
 ## Rinkeby Deployment
+### myid.open.aragonpm.eth v1.0.1:
+ - Content (ipfs): QmXx7BWPr4KZ6DKx1XTDtU1bQB2QGDLqr1Vk5wUGvo8unK
+ - Transaction hash: 0x810ca35ca9b3c288f83e2ba2e3d9f0a2ecd0e884c9c9f04e7a082d268a2fe218
+
 ### myid.open.aragonpm.eth v1.0.0:
  - Contract address: 0x3D25D2986C1F638b64065206Cf5D77A72464892e
  - Content (ipfs): QmbQQVngPP8iHVSkQZsjbf3C2KxwBgh6Z5yUSS2dnftBz3

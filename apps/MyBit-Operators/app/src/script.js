@@ -108,6 +108,7 @@ function newRequest(state, { operatorID, name, operatorAddress, referrerAddress,
       referrer: referrerAddress,
       ipfs: ipfs,
       assetType: assetType,
+      approved: false,
       proposed: false,
       confirmed: false,
       removed: false,
@@ -219,7 +220,6 @@ function getVote(voting, id){
   return new Promise((resolve, reject) =>
     voting
       .getVote(id)
-      .first()
       .subscribe(resolve, reject)
   )
 }

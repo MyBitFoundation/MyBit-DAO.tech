@@ -4,6 +4,7 @@ import { hasLoadedTokenSettings } from './token-settings'
 // Convert tokenSupply and holders balances to BNs,
 // and calculate tokenDecimalsBase.
 function appStateReducer(state) {
+  console.log('Reducer')
   const appStateReady = hasLoadedTokenSettings(state)
   if (!appStateReady) {
     return {
@@ -14,6 +15,7 @@ function appStateReducer(state) {
 
   console.log(state)
   const {
+    escrowRemaining,
     holders,
     fundingRequests,
     erc20Decimals,
@@ -24,12 +26,16 @@ function appStateReducer(state) {
     fundingGoal,
     fundingProgress
   } = state
+  const collateralSymbol = 'MYB'
+  const collateralDecimalsBase = new BN(10).pow(new BN(18))
   const tokenDecimalsBase = new BN(10).pow(new BN(tokenDecimals))
   const erc20DecimalsBase = new BN(10).pow(new BN(erc20Decimals))
 
   return {
     ...state,
     appStateReady,
+    collateralSymbol,
+    collateralDecimalsBase,
     tokenDecimalsBase,
     erc20DecimalsBase,
     isSyncing: false,
@@ -61,6 +67,7 @@ function appStateReducer(state) {
           .filter(({ approved, confirmed, failed }) => ((approved === true || confirmed === true) && failed === false))
           .map(request => ({ ...request, amount: new BN(request.amount) }))
       : [],
+    escrowRemaining: new BN(escrowRemaining),
     erc20Decimals: new BN(erc20Decimals),
     tokenDecimals: new BN(tokenDecimals),
     tokenSupply: new BN(tokenSupply),

@@ -39,7 +39,6 @@ class App extends React.PureComponent {
     const { ipfs } = this.state
     const { api } = this.props
     const files = []
-    console.log('1')
     if(docBufferArray.length > 0){
       for(let i=0; i<docBufferArray.length; i++){
         files.push({
@@ -56,7 +55,6 @@ class App extends React.PureComponent {
         })
       }
     }
-    console.log('2')
     //Generate json file
     const json = JSON.stringify({
       name: name,
@@ -71,12 +69,10 @@ class App extends React.PureComponent {
       path: 'folder/profile.json',
       content: Buffer.from(json)
     })
-    console.log('3')
     ipfs.add(files)
       .then(results => {
         const hashIndex = results.findIndex(ipfsObject => ipfsObject.path === "folder")
         this.handleSidepanelClose()
-        console.log(results[hashIndex].hash)
         //Save request ot Ethereum (two parts -- submitProof, then requestAuthorization (which goes to a vote))
         api.newRequest(name, address, referrer, results[hashIndex].hash)
            .toPromise()
@@ -141,7 +137,7 @@ class App extends React.PureComponent {
               }}
               smallViewPadding={0}
             >
-              {appStateReady && (confirmed.length > 0 || proposals.length > 0 || requests.length > 0 || approved.lenght > 0) ? (
+              {appStateReady && (confirmed.length > 0 || proposals.length > 0 || requests.length > 0 || approved.length > 0) ? (
                 <Operators
                   confirmed={confirmed}
                   proposals={proposals}

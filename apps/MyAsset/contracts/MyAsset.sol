@@ -26,6 +26,7 @@ contract MyAsset is IForwarder, AragonApp {
     event Contribution(address contributor, uint amount, uint currentProgress, uint currentGoal);
     event Withdrawal(address manager, uint amount);
     event ReplaceManager(address asset, address newManager, uint amount, bool withhold);
+    event EscrowBurned();
 
     bytes32 public constant FUND_ROLE = keccak256("FUND_ROLE");
     bytes32 public constant REPLACE_ROLE = keccak256("REPLACE_ROLE");
@@ -158,6 +159,7 @@ contract MyAsset is IForwarder, AragonApp {
     */
     function burnEscrow() external auth(BURN_ROLE) {
       AssetManagerEscrowInterface(api.getContract('AssetManagerEscrow')).voteToBurn(address(token));
+      emit EscrowBurned();
     }
 
     // Forwarding fns

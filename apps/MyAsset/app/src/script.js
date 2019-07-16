@@ -1,4 +1,4 @@
-import '@babel/polyfill'
+//import '@babel/polyfill'
 import { of } from './rxjs'
 import Aragon from '@aragon/api'
 import tokenSettings from './token-settings'
@@ -88,6 +88,7 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
       console.log('Return Values: ', returnValues)
       switch (event) {
         case INITIALIZATION_TRIGGER:
+          console.log('Init')
           return await initState({token, tokenAddress, erc20, erc20Address, api, apiAddress})
         case 'NewFundingRequest':
           return newFundingRequest(nextState, returnValues)
@@ -97,6 +98,8 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
           return newContribution(nextState, returnValues)
         case 'ReplaceManager':
           return updateManager(nextState, returnValues)
+        case 'EscrowBurned':
+          return escrowBurned(nextState)
         case 'ClaimedTokens':
           if (addressesEqual(returnValues._token, tokenAddress)) {
             return claimedTokens(token, nextState, returnValues)
@@ -106,6 +109,8 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
           return transfer(token, nextState, returnValues)
         case 'StartVote':
           return await updateVote(voting, nextState, returnValues)
+        case 'ExecuteVote':
+          return await executeVote(voting, nextState, returnValues)
         default:
           return nextState
       }
@@ -121,19 +126,11 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
 }
 
 async function initState({ token, tokenAddress, erc20, erc20Address, api, apiAddress }) {
-  try {
-    const tokenSymbol = await token.symbol().toPromise()
-    app.identify(tokenSymbol)
-  } catch (err) {
-    console.error(
-      `Failed to load token symbol for token at ${tokenAddress} due to:`,
-      err
-    )
-  }
-
   const tokenInfo = await loadSettings(token, tokenSettings)
   const erc20Info = await loadSettings(erc20, erc20Settings)
   const assetManager = await api.getAssetManager(tokenAddress).toPromise()
+  const escrowID = await api.getAssetManagerEscrowID(tokenAddress, assetManager).toPromise()
+  const escrowRemaining = await api.getAssetManagerEscrowRemaining(escrowID).toPromise()
   const holdingContract = await api.getContract('AssetManagerFunds').toPromise()
   const escrowContract = await api.getContract('AssetManagerEscrow').toPromise()
   const fundingGoal = await app.call('fundingProgress').toPromise()
@@ -141,6 +138,7 @@ async function initState({ token, tokenAddress, erc20, erc20Address, api, apiAdd
   const initialState = {
     apiAddress,
     assetManager,
+    escrowRemaining,
     erc20Address,
     ...erc20Info,
     escrowContract,
@@ -213,10 +211,18 @@ function newContribution(state, {currentProgress, currentGoal}) {
   }
 }
 
-function updateManager(state, { newManager }) {
+function updateManager(state, { newManager, amount }) {
   return {
     ...state,
-    assetManager: newManager
+    assetManager: newManager,
+    escrowRemaining: amount,
+  }
+}
+
+function escrowBurned(state) {
+  return {
+    ...state,
+    escrowRemaining: 0
   }
 }
 
@@ -225,48 +231,71 @@ async function updateVote(voting, state, { voteId, creator }) {
   if(thisAddress && addressesEqual(thisAddress, creator)){
     const results = await getVote(voting, voteId)
     const { open, executed, supportRequired, minAcceptQuorum, yea, nay, votingPower, script } = results
-    const pctBase = new BN(10).pow(new BN(18))
     const bytes = `0x${script.slice(66)}`
-    const requestID = hexToNumber(bytes)
-    const requestIndex = fundingRequests.findIndex(request =>
-      request.requestID == requestID
-    )
-    if (requestIndex !== -1) {
-      //Set initiated to true
-      fundingRequests[requestIndex].proposed = true
-      if(open === false && executed === false){
-        const bnYea = new BN(yea)
-        const bnNay = new BN(nay)
-        const bnVotingPower = new BN(votingPower)
-        const bnSupportRequired = new BN(supportRequired)
-        const bnMinQuorum = new BN(minAcceptQuorum)
-        const totalVotes = bnYea.add(bnNay);
-        if (totalVotes.isZero()) {
-          fundingRequests[requestIndex].failed = true
-        } else {
-          const yeaPct = bnYea.mul(pctBase).div(totalVotes)
-          const yeaOfTotalPowerPct = bnYea.mul(pctBase).div(bnVotingPower)
-          // Mirror on-chain calculation
-          // yea / votingPower > supportRequired ||
-          //   (yea / totalVotes > supportRequired &&
-          //    yea / votingPower > minAcceptQuorum)
-          if(yeaOfTotalPowerPct.gt(bnSupportRequired) || (yeaPct.gt(bnSupportRequired) && yeaOfTotalPowerPct.gt(bnMinQuorum))){
-            fundingRequests[requestIndex].approved = true
-          } else {
+    if(bytes.length == 66){
+      console.log('Bytes: ', bytes)
+      const requestID = hexToNumber(bytes)
+      console.log('RequestID: ', requestID)
+      const requestIndex = fundingRequests.findIndex(request =>
+        request.requestID == requestID
+      )
+      console.log('Request index: ', requestIndex)
+      if (requestIndex !== -1) {
+        //Set initiated to true
+        fundingRequests[requestIndex].voteID = voteId
+        fundingRequests[requestIndex].proposed = true
+        if(open === false && executed === false){
+          const bnYea = new BN(yea)
+          const bnNay = new BN(nay)
+          const bnVotingPower = new BN(votingPower)
+          const bnSupportRequired = new BN(supportRequired)
+          const bnMinQuorum = new BN(minAcceptQuorum)
+          const totalVotes = bnYea.add(bnNay);
+          if (totalVotes.isZero()) {
             fundingRequests[requestIndex].failed = true
+          } else {
+            const pctBase = new BN(10).pow(new BN(18))
+            const yeaPct = bnYea.mul(pctBase).div(totalVotes)
+            const yeaOfTotalPowerPct = bnYea.mul(pctBase).div(bnVotingPower)
+            // Mirror on-chain calculation
+            // yea / votingPower > supportRequired ||
+            //   (yea / totalVotes > supportRequired &&
+            //    yea / votingPower > minAcceptQuorum)
+            if(yeaOfTotalPowerPct.gt(bnSupportRequired) || (yeaPct.gt(bnSupportRequired) && yeaOfTotalPowerPct.gt(bnMinQuorum))){
+              fundingRequests[requestIndex].approved = true
+            } else {
+              fundingRequests[requestIndex].failed = true
+            }
           }
+        } else if(executed === true){
+          fundingRequests[requestIndex].approved = true
+          fundingRequests[requestIndex].confirmed = true
         }
-      } else if(executed === true){
-        fundingRequests[requestIndex].approved = true
-        fundingRequests[requestIndex].confirmed = true
       }
-    }
-    return {
-      ...state,
-      fundingRequests
+      return {
+        ...state,
+        fundingRequests
+      }
+    } else {
+      return state
     }
   } else {
     return state
+  }
+}
+
+async function executeVote(voting, state, {voteId}) {
+  const { fundingRequests = [] } = state
+  const requestIndex = fundingRequests.findIndex(request =>
+    request.voteID == voteId
+  )
+  if (requestIndex !== -1) {
+    fundingRequests[requestIndex].approved = true
+    fundingRequests[requestIndex].confirmed = true
+  }
+  return {
+    ...state,
+    fundingRequests
   }
 }
 

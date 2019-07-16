@@ -42,13 +42,15 @@ class SideBar extends React.PureComponent {
   render() {
     const {
       assetManager,
+      collateralDecimalsBase,
+      collateralSymbol,
+      escrowRemaining,
       holders,
       isCurrentUser,
       network,
       onContribute,
       tokenAddress,
       tokenDecimalsBase,
-      tokenName,
       tokenSupply,
       tokenIncome,
       tokenSymbol,
@@ -105,6 +107,11 @@ class SideBar extends React.PureComponent {
               />
             </InfoRow>
             <InfoRow>
+              <span>Collateral</span>
+              <span>:</span>
+              <strong>{formatBalance(escrowRemaining, collateralDecimalsBase)} {collateralSymbol}</strong>
+            </InfoRow>
+            <InfoRow>
               <span>Total Income</span>
               <span>:</span>
               <strong>{formatBalance(tokenIncome, erc20DecimalsBase)} {erc20Symbol}</strong>
@@ -124,7 +131,6 @@ class SideBar extends React.PureComponent {
               <span>:</span>
               <TokenBadge
                 address={tokenAddress}
-                name={tokenName}
                 symbol={tokenSymbol}
                 networkType={network.type}
               />
