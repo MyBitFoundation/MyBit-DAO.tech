@@ -98,8 +98,17 @@ class App extends React.PureComponent {
     this.handleSidepanelClose()
   }
   handleContribute = amount => {
-    const { api } = this.props
-    api.contribute(amount).toPromise()
+    const { api, erc20Address } = this.props
+    if(erc20Address != '0x0000000000000000000000000000000000000000'){
+      let intentParams = {
+        token: { address: erc20Address, value: amount },
+        gas:'500000'
+      }
+      api.contribute(amount, intentParams).toPromise()
+    } else {
+      api.contribute(amount).toPromise()
+    }
+
     this.handleSidepanelClose()
   }
   handleProposal = requestID => {
@@ -251,6 +260,7 @@ class App extends React.PureComponent {
                   opened={sidepanelOpened}
                   managerAddress={proposedManager}
                   assetManager={assetManager}
+                  erc20Address={erc20Address}
                   erc20Symbol={erc20Symbol}
                   erc20Decimals={numData.erc20Decimals}
                   erc20DecimalsBase={tokenDecimalsBase}
@@ -263,6 +273,7 @@ class App extends React.PureComponent {
               {appStateReady && mode === 'contribute' && (
                 <ContributePanelContent
                   opened={sidepanelOpened}
+                  userAccount={connectedAccount}
                   erc20Symbol={erc20Symbol}
                   erc20Decimals={numData.erc20Decimals}
                   erc20DecimalsBase={erc20DecimalsBase}

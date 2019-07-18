@@ -118,7 +118,7 @@ contract MyAsset is IForwarder, AragonApp {
         fundingGoal = 0;
         fundingProgress = 0;
       } else {
-        if(address(erc20) == address(0)){
+        if(address(erc20) != address(0)){
           erc20.transferFrom(msg.sender, address(this), actualAmount);
         }
         fundingProgress = fundingProgress.add(actualAmount);

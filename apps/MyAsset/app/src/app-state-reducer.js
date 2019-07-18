@@ -4,7 +4,6 @@ import { hasLoadedTokenSettings } from './token-settings'
 // Convert tokenSupply and holders balances to BNs,
 // and calculate tokenDecimalsBase.
 function appStateReducer(state) {
-  console.log('Reducer')
   const appStateReady = hasLoadedTokenSettings(state)
   if (!appStateReady) {
     return {
@@ -13,7 +12,6 @@ function appStateReducer(state) {
     }
   }
 
-  console.log(state)
   const {
     escrowRemaining,
     holders,

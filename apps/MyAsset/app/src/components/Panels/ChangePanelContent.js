@@ -1,8 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Button, Field, Radio, RadioGroup, IconCross, Text, TextInput, Info, SafeLink } from '@aragon/ui'
+import { Button, Field, Radio, RadioGroup, IconCross, Text, TextInput, Info, SafeLink, theme } from '@aragon/ui'
 import { isAddress } from '../../web3-utils'
 import { fromDecimals, toDecimals, formatBalance } from '../../utils'
+import LocalIdentityBadge from '../LocalIdentityBadge/LocalIdentityBadge'
 
 // Any more and the number input field starts to put numbers in scientific notation
 const MAX_INPUT_DECIMAL_BASE = 6
@@ -135,7 +136,7 @@ class ChangePanelContent extends React.Component {
   }
   render() {
     const { managerField, amountField, withholdActive } = this.state
-    const { erc20Symbol, erc20Decimals, escrowContract, network } = this.props
+    const { erc20Address, erc20Symbol, erc20Decimals, escrowContract, network } = this.props
 
     const minTokenStep = fromDecimals(
       '1',
@@ -144,6 +145,9 @@ class ChangePanelContent extends React.Component {
 
     const errorMessage = managerField.error || amountField.error
     const warningMessage = managerField.warning || amountField.warning
+
+    console.log('Escrow contract: ', escrowContract)
+    console.log('MYB contract: ', erc20Address)
 
     return (
       <div>
@@ -154,6 +158,7 @@ class ChangePanelContent extends React.Component {
               the same amount of ${erc20Symbol} as submitted by this form. Failure to
               do so will prevent the vote from being executed.`}
           </Info.Action>
+
           {NETWORK_NAMES[network.id] && (
             <div css="margin-top: 10px">
               <Info.Action>
@@ -164,6 +169,24 @@ class ChangePanelContent extends React.Component {
             </div>
           )}
           <br/>
+          <InfoRowContainer>
+            <InfoRow>
+              <span>{`${erc20Symbol} Contract`}</span>
+              <span>:</span>
+              <LocalIdentityBadge
+                entity={erc20Address}
+                networkType={network.type}
+              />
+            </InfoRow>
+            <InfoRow>
+              <span>Escrow Contract</span>
+              <span>:</span>
+              <LocalIdentityBadge
+                entity={escrowContract}
+                networkType={network.type}
+              />
+            </InfoRow>
+          </InfoRowContainer>
           <Field
             label={`
               New Manager (must be a valid Ethereum address)
@@ -219,6 +242,40 @@ class ChangePanelContent extends React.Component {
     )
   }
 }
+
+const InfoRow = styled.li`
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+  margin-bottom:10px;
+
+  > span:nth-child(1) {
+    font-weight: 400;
+    color: ${theme.textSecondary};
+  }
+  > span:nth-child(2) {
+    opacity: 0;
+    width: 10px;
+  }
+  > span:nth-child(3) {
+    flex-shrink: 1;
+  }
+  > strong {
+    text-transform: uppercase;
+  }
+`
+
+const InfoRowContainer = styled.div`
+  padding:10px;
+  color:${theme.textSecondary};
+  background-color:${theme.infoBackground};
+  border-radius:5px;
+  margin-bottom:10px;
+
+  & li:last-of-type{
+    margin-bottom:0;
+  }
+`
 
 const Message = styled.div`
   & + & {

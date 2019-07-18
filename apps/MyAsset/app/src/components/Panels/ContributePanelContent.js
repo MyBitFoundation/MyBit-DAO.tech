@@ -28,7 +28,7 @@ class ContributePanelContent extends React.Component {
   state = {
     ...initialState,
   }
-  _holderInput = React.createRef()
+  _amountInput = React.createRef()
   componentWillReceiveProps({ opened, userAccount }) {
     if (opened && !this.props.opened) {
       // setTimeout is needed as a small hack to wait until the input is
@@ -37,7 +37,7 @@ class ContributePanelContent extends React.Component {
         setTimeout(() => this._amountInput.current.focus(), 0)
 
       // Update holder address from the props
-      this.updateUserAddress(mode, userAccount)
+      this.updateUserAddress(userAccount)
     }
 
     // Finished closing the panel, its state can be reset
@@ -50,14 +50,14 @@ class ContributePanelContent extends React.Component {
     const { amountField } = this.state
     return toDecimals(amountField.value.trim(), erc20Decimals)
   }
-  updateUserAddress(mode, value) {
+  async updateUserAddress(value) {
     const {
       erc20DecimalsBase,
       erc20Decimals,
       getERC20Balance,
     } = this.props
-
-    const holderBalance = getERC20Balance(value.trim())
+    console.log('Value: ', value)
+    const holderBalance = await getERC20Balance(value.trim())
 
     this.setState(({ holderField, amountField }) => ({
       holderField: { ...holderField, value, error: null },

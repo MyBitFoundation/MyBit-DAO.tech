@@ -69,8 +69,6 @@ retryEvery(retry => {
 
 async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress) {
   const token = app.external(tokenAddress, tokenAbi)
-  const erc20 = app.external(erc20Address, erc20Abi)
-  const api = app.external(apiAddress, apiAbi)
   const voting = app.external(votingAddress, votingAbi)
 
   return app.store(
@@ -89,7 +87,7 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
       switch (event) {
         case INITIALIZATION_TRIGGER:
           console.log('Init')
-          return await initState({token, tokenAddress, erc20, erc20Address, api, apiAddress})
+          return await initState({token, tokenAddress, erc20Address, apiAddress})
         case 'NewFundingRequest':
           return newFundingRequest(nextState, returnValues)
         case 'FundingStarted':
@@ -125,9 +123,22 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
   )
 }
 
-async function initState({ token, tokenAddress, erc20, erc20Address, api, apiAddress }) {
+async function initState({ token, tokenAddress, erc20Address, apiAddress }) {
+  if(erc20Address == '0x0000000000000000000000000000000000000000'){
+    const erc20Info = {
+      erc20Decimals: '18',
+      erc20Symbol: 'ETH',
+      erc20Name: 'Ethereum',
+    }
+  } else {
+    const erc20 = app.external(erc20Address, erc20Abi)
+    const erc20Info = await loadSettings(erc20, erc20Settings)
+  }
+
+  const api = app.external(apiAddress, apiAbi)
+
   const tokenInfo = await loadSettings(token, tokenSettings)
-  const erc20Info = await loadSettings(erc20, erc20Settings)
+
   const assetManager = await api.getAssetManager(tokenAddress).toPromise()
   const escrowID = await api.getAssetManagerEscrowID(tokenAddress, assetManager).toPromise()
   const escrowRemaining = await api.getAssetManagerEscrowRemaining(escrowID).toPromise()
