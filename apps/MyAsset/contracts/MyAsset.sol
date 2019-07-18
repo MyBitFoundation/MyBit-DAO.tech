@@ -56,6 +56,13 @@ contract MyAsset is IForwarder, AragonApp {
     }
 
     /**
+    * @notice View funds available to withdraw
+    */
+    function viewFunds() external view returns (uint256) {
+      return erc20.balanceOf(this);
+    }
+
+    /**
     * @notice Initialize MyAsset for `_token.symbol(): string`
     * @param _token AssetToken address for the managed token (Token Manager instance must be already set as the token controller)
     */
@@ -87,7 +94,7 @@ contract MyAsset is IForwarder, AragonApp {
     }
 
     /**
-    * @notice Initiate funding for request `_fundingRequest`
+    * @notice Initiate funding for request ID: `_fundingRequest`
     * @param _fundingRequest The ID of the funding request
     */
     function startFunding(uint _fundingRequest) external auth(FUND_ROLE) {
@@ -133,7 +140,7 @@ contract MyAsset is IForwarder, AragonApp {
     function withdraw() external {
       require(msg.sender == api.getAssetManager(address(token)));
       uint balance;
-      if(address(erc20) == address(0)){
+      if(address(erc20) != address(0)){
         balance = erc20.balanceOf(this);
         erc20.transfer(msg.sender, balance);
       } else {

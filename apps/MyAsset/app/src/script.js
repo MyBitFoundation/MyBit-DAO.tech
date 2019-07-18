@@ -86,7 +86,6 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
       console.log('Return Values: ', returnValues)
       switch (event) {
         case INITIALIZATION_TRIGGER:
-          console.log('Init')
           return await initState({token, tokenAddress, erc20Address, apiAddress})
         case 'NewFundingRequest':
           return newFundingRequest(nextState, returnValues)
@@ -94,6 +93,8 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
           return startFunding(nextState, returnValues)
         case 'Contribution':
           return newContribution(nextState, returnValues)
+        case 'Withdrawal':
+          return withdrawal(nextState)
         case 'ReplaceManager':
           return updateManager(nextState, returnValues)
         case 'EscrowBurned':
@@ -105,6 +106,8 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
           return nextState
         case 'Transfer':
           return transfer(token, nextState, returnValues)
+        case 'LogIncomeReceived':
+          return incomeReceived(nextState, returnValues)
         case 'StartVote':
           return await updateVote(voting, nextState, returnValues)
         case 'ExecuteVote':
@@ -124,31 +127,32 @@ async function initialize(tokenAddress, erc20Address, apiAddress, votingAddress)
 }
 
 async function initState({ token, tokenAddress, erc20Address, apiAddress }) {
+  let erc20Info
   if(erc20Address == '0x0000000000000000000000000000000000000000'){
-    const erc20Info = {
+    erc20Info = {
       erc20Decimals: '18',
       erc20Symbol: 'ETH',
       erc20Name: 'Ethereum',
     }
   } else {
     const erc20 = app.external(erc20Address, erc20Abi)
-    const erc20Info = await loadSettings(erc20, erc20Settings)
+    erc20Info = await loadSettings(erc20, erc20Settings)
   }
-
-  const api = app.external(apiAddress, apiAbi)
-
   const tokenInfo = await loadSettings(token, tokenSettings)
 
+  const api = app.external(apiAddress, apiAbi)
   const assetManager = await api.getAssetManager(tokenAddress).toPromise()
   const escrowID = await api.getAssetManagerEscrowID(tokenAddress, assetManager).toPromise()
   const escrowRemaining = await api.getAssetManagerEscrowRemaining(escrowID).toPromise()
   const holdingContract = await api.getContract('AssetManagerFunds').toPromise()
   const escrowContract = await api.getContract('AssetManagerEscrow').toPromise()
+  const availableFunds = await app.call('viewFunds').toPromise()
   const fundingGoal = await app.call('fundingProgress').toPromise()
   const fundingProgress = await app.call('fundingProgress').toPromise()
   const initialState = {
     apiAddress,
     assetManager,
+    availableFunds,
     escrowRemaining,
     erc20Address,
     ...erc20Info,
@@ -185,6 +189,15 @@ async function transfer(token, state, { _from, _to }) {
   )
 }
 
+function incomeReceived(state, {amount}) {
+  const { tokenIncome } = state
+  const newIncome = tokenIncome + amount
+  return {
+    ...state,
+    tokenIncome: newIncome,
+  }
+}
+
 function startFunding(state, {fundingGoal}) {
   return {
     ...state,
@@ -214,11 +227,20 @@ function newFundingRequest(state, {requestID, amount, receipt}) {
   }
 }
 
-function newContribution(state, {currentProgress, currentGoal}) {
+async function newContribution(state, {currentProgress, currentGoal}) {
+  const availableFunds = await app.call('viewFunds').toPromise()
   return {
     ...state,
+    availableFunds,
     fundingProgress: currentProgress,
     fundingGoal: currentGoal
+  }
+}
+
+function withdrawal(state) {
+  return {
+    ...state,
+    availableFunds: 0
   }
 }
 
@@ -244,13 +266,10 @@ async function updateVote(voting, state, { voteId, creator }) {
     const { open, executed, supportRequired, minAcceptQuorum, yea, nay, votingPower, script } = results
     const bytes = `0x${script.slice(66)}`
     if(bytes.length == 66){
-      console.log('Bytes: ', bytes)
       const requestID = hexToNumber(bytes)
-      console.log('RequestID: ', requestID)
       const requestIndex = fundingRequests.findIndex(request =>
         request.requestID == requestID
       )
-      console.log('Request index: ', requestIndex)
       if (requestIndex !== -1) {
         //Set initiated to true
         fundingRequests[requestIndex].voteID = voteId

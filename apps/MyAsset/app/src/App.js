@@ -11,12 +11,15 @@ import RequestFundsPanelContent from './components/Panels/RequestFundsPanelConte
 import AssignTokensIcon from './components/AssignTokensIcon'
 import FundingIcon from './components/FundingIcon'
 import BurnIcon from './components/BurnIcon'
+import WithdrawIcon from './components/WithdrawIcon'
 import AppLayout from './components/AppLayout'
+import { formatBalance } from './utils'
 import { addressesEqual } from './web3-utils'
 import { IdentityProvider } from './components/IdentityManager/IdentityManager'
 import loadIPFS from './ipfs'
 import { Buffer } from 'ipfs-http-client'
 import erc20Abi from './abi/standardToken.json'
+import tokenAbi from './abi/minimeToken.json'
 
 const panelTitle = {
   'change' : 'Propose New Asset Manager',
@@ -30,6 +33,7 @@ class App extends React.PureComponent {
   }
   static defaultProps = {
     appStateReady: false,
+    availableFunds: new BN(0),
     escrowRemaining: new BN(0),
     isSyncing: false,
     holders: [],
@@ -67,9 +71,26 @@ class App extends React.PureComponent {
 
   getERC20Balance = async (address) => {
     const { api, erc20Address } = this.props
-    const erc20 = api.external(erc20Address, erc20Abi)
-    const amount = await erc20.balanceOf(address).toPromise
+    let amount
+    if(erc20Address == '0x0000000000000000000000000000000000000000'){
+      amount = await api.web3Eth.getBalance(address).toPromise()
+    } else {
+      const erc20 = api.external(erc20Address, erc20Abi)
+      amount = await erc20.balanceOf(address).toPromise()
+    }
     return new BN(amount)
+  }
+
+  getOwed = async (address) => {
+    const { api, tokenAddress } = this.props
+    const token = api.external(tokenAddress, tokenAbi)
+    const amount = await token.getAmountOwed(address).toPromise()
+    return new BN(amount)
+  }
+
+  getFunds = async () => {
+    const { thisAddress } = this.props
+    return await this.getERC20Balance(thisAddress)
   }
 
   handleRequest = ({ amount, description, buffer }) => {
@@ -119,6 +140,15 @@ class App extends React.PureComponent {
     const { api } = this.props
     api.burnEscrow().toPromise()
   }
+  handleWithdrawIncome = () => {
+    const { api, tokenAddress } = this.props
+    const token = api.external(tokenAddress, tokenAbi)
+    token.withdraw().toPromise()
+  }
+  handleWithdrawFunds = () => {
+    const { api } = this.props
+    api.withdraw().toPromise()
+  }
   launchChangePanel = () => {
     this.setState({
       mode: 'change',
@@ -152,6 +182,7 @@ class App extends React.PureComponent {
     const {
       appStateReady,
       assetManager,
+      availableFunds,
       connectedAccount,
       collateralSymbol,
       collateralDecimalsBase,
@@ -182,6 +213,22 @@ class App extends React.PureComponent {
     } = this.props
 
     const { mode, proposedManager, sidepanelOpened, ipfs, ipfsURL } = this.state
+
+    let secondaryButton
+    if(assetManager !== connectedAccount && escrowRemaining.gt(new BN(0))){
+      secondaryButton = ({
+        label: 'Burn Collateral',
+        icon: <BurnIcon />,
+        onClick: this.handleBurn,
+      })
+    }
+    if(assetManager === connectedAccount && availableFunds.gt(new BN(0))){
+      secondaryButton = ({
+        label: `Withdraw ${formatBalance(availableFunds, erc20DecimalsBase)} ${erc20Symbol}`,
+        icon: <WithdrawIcon />,
+        onClick: this.handleWithdrawFunds,
+      })
+    }
     return (
       <Main assetsUrl="./aragon-ui">
         <div css="min-width: 320px">
@@ -204,12 +251,7 @@ class App extends React.PureComponent {
                   onClick: this.launchRequestFundsPanel,
                 })
               }
-              secondaryButton={(assetManager !== connectedAccount && escrowRemaining.gt(new BN(0))) ? ({
-                  label: 'Burn Collateral',
-                  icon: <BurnIcon />,
-                  onClick: this.handleBurn,
-                }) : (null)
-              }
+              secondaryButton={secondaryButton}
               smallViewPadding={0}
             >
               {appStateReady && holders.length > 0 ? (
@@ -241,6 +283,8 @@ class App extends React.PureComponent {
                   ipfsURL={ipfsURL}
                   onContribute={this.launchContributePanel}
                   onCreateProposal={this.handleProposal}
+                  onWithdraw={this.handleWithdrawIncome}
+                  getOwed={this.getOwed}
                 />
               ) : (
                 !isSyncing && (

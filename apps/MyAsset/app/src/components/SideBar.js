@@ -1,4 +1,5 @@
 import React from 'react'
+import BN from 'bn.js'
 import styled from 'styled-components'
 import { Button, ProgressBar, TokenBadge, Text, breakpoint, theme } from '@aragon/ui'
 import { useNetwork } from '@aragon/api-react'
@@ -32,6 +33,14 @@ class SideBar extends React.PureComponent {
   static defaultProps = {
     holders: [],
   }
+  state = {
+    withdrawAvailable: new BN(0),
+  }
+  componentDidMount = async () => {
+    const { getOwed, userAccount } = this.props
+    const amount = await getOwed(userAccount)
+    this.setState({withdrawAvailable:amount})
+  }
   transferableLabel() {
     const { tokenTransfersEnabled } = this.props
     if (tokenTransfersEnabled === undefined) {
@@ -49,6 +58,7 @@ class SideBar extends React.PureComponent {
       isCurrentUser,
       network,
       onContribute,
+      onWithdraw,
       tokenAddress,
       tokenDecimalsBase,
       tokenSupply,
@@ -61,6 +71,7 @@ class SideBar extends React.PureComponent {
       fundingProgress,
       ...rest
     } = this.props
+    const { withdrawAvailable } = this.state
     const stakes = displayedStakes(holders, tokenSupply)
     return (
       <Main {...rest}>
@@ -112,12 +123,17 @@ class SideBar extends React.PureComponent {
               <strong>{formatBalance(escrowRemaining, collateralDecimalsBase)} {collateralSymbol}</strong>
             </InfoRow>
             <InfoRow>
-              <span>Total Income</span>
+              <span>Asset Income</span>
               <span>:</span>
               <strong>{formatBalance(tokenIncome, erc20DecimalsBase)} {erc20Symbol}</strong>
             </InfoRow>
             <InfoRow>
-              <span>Total Supply</span>
+              <span>Available Income</span>
+              <span>:</span>
+              <strong>{formatBalance(withdrawAvailable, erc20DecimalsBase)} {erc20Symbol}</strong>
+            </InfoRow>
+            <InfoRow>
+              <span>Token Supply</span>
               <span>:</span>
               <strong>{formatBalance(tokenSupply, tokenDecimalsBase)}</strong>
             </InfoRow>
@@ -135,6 +151,18 @@ class SideBar extends React.PureComponent {
                 networkType={network.type}
               />
             </InfoRow>
+            {/*Remove 'false &&' when we figure out a way of calling MiniMeToken directly*/}
+            {false && withdrawAvailable > 0 && (
+              <ButtonDiv>
+                <Button
+                  mode="secondary"
+                  onClick={onWithdraw}
+                  wide
+                >
+                  Withdraw Income
+                </Button>
+              </ButtonDiv>
+            )}
           </ul>
         </Part>
         <Part>

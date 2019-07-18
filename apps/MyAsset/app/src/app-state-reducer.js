@@ -13,6 +13,7 @@ function appStateReducer(state) {
   }
 
   const {
+    availableFunds,
     escrowRemaining,
     holders,
     fundingRequests,
@@ -65,6 +66,7 @@ function appStateReducer(state) {
           .filter(({ approved, confirmed, failed }) => ((approved === true || confirmed === true) && failed === false))
           .map(request => ({ ...request, amount: new BN(request.amount) }))
       : [],
+    availableFunds: new BN(availableFunds),
     escrowRemaining: new BN(escrowRemaining),
     erc20Decimals: new BN(erc20Decimals),
     tokenDecimals: new BN(tokenDecimals),

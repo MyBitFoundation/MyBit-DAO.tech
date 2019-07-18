@@ -41,6 +41,7 @@ class Holders extends React.Component {
       fundingProgress,
       onContribute,
       onCreateProposal,
+      onWithdraw,
       tokenAddress,
       tokenDecimalsBase,
       tokenName,
@@ -55,6 +56,7 @@ class Holders extends React.Component {
       userAccount,
       ipfsAPI,
       ipfsURL,
+      getOwed,
     } = this.props
     const { selectedTab } = this.state
     const test = true
@@ -269,6 +271,8 @@ class Holders extends React.Component {
                   erc20Symbol={erc20Symbol}
                   userAccount={userAccount}
                   onContribute={onContribute}
+                  onWithdraw={onWithdraw}
+                  getOwed={getOwed}
                 />
               )}
             </TwoPanels>
