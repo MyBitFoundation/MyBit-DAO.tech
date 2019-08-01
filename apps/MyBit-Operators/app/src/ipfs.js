@@ -6,8 +6,8 @@ module.exports = new Promise(function (resolve) {
 
     ipfs.id(function(err, identity){
       if(err){
-        ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-        ipfsURL = 'http://ipfs.mybit.io/ipfs/';
+        ipfs = new IPFS({ host: 'ipfs.mybit.io', port: 443, protocol: 'https' });
+        ipfsURL = 'https://gateway.mybit.io/ipfs/';
         resolve({ipfs, ipfsURL})
 
       } else {

@@ -14,6 +14,7 @@ const initialState = {
   error: null,
   warning: null,
   loading: false,
+  fileList: [],
 }
 
 class RequestPanelContent extends React.Component {
@@ -70,11 +71,12 @@ class RequestPanelContent extends React.Component {
     //file is converted to a buffer for upload to IPFS
     const buffer = await Buffer.from(reader.result);
     //set this buffer-using es6 syntax
-    this.setState({buffer});
+    return buffer
   };
 
   //Take file input from user
   handleFileChange = event => {
+    const fileList = []
     event.stopPropagation()
     event.preventDefault()
     const file = event.target.files[0]
@@ -82,9 +84,17 @@ class RequestPanelContent extends React.Component {
     this.setState({
       type: arr[arr.length-1]
     })
-    let reader = new window.FileReader()
+    const reader = new window.FileReader()
     reader.readAsArrayBuffer(file)
-    reader.onloadend = () => this.convertToBuffer(reader)
+    reader.onloadend = () => {
+      this.convertToBuffer(reader).then(buffer => {
+        fileList.push(file)
+        this.setState({
+          fileList,
+          buffer: buffer
+        })
+      })
+    }
   };
 
   handleIntroChange = event => {
@@ -192,7 +202,16 @@ class RequestPanelContent extends React.Component {
       error,
       warning,
       loading,
+      fileList
     } = this.state
+
+    let fileListHTML = "No file uploaded"
+    if(fileList.length > 0){
+      fileListHTML = []
+      fileList.forEach(function (file, index){
+        fileListHTML.push(<li key={index}>{file.name}</li>)
+      })
+    }
 
     return (
       <div>
@@ -200,16 +219,20 @@ class RequestPanelContent extends React.Component {
           <Field
             label='Upload Photo'
           >
-            <p>
+            <p style={{marginBottom:'10px'}}>
               Photos are one of the best ways to know that you are not a bot.
               Please take a photo of yourself holding a piece of paper that displays your Ethereum address.
             </p>
-            <br/>
-            <input
-              type = "file"
-              onChange = {this.handleFileChange}
-              required
+            <FileInput
+              message='Upload Photo'
+              mode='secondary'
+              onChange={this.handleFileChange}
+              multiple={false}
+              required={true}
             />
+            <FileList>
+              {fileListHTML}
+            </FileList>
           </Field>
           <Field
             label='Introduce Yourself (markdown supported)'
@@ -297,6 +320,37 @@ class RequestPanelContent extends React.Component {
     )
   }
 }
+
+const FileInput = ({ multiple, required, message, mode, onChange }) => (
+  <div style={{ width:'100%', position: 'relative', overflow: 'hidden', display: 'inline-block'}}>
+    <Button
+      mode={mode}
+      wide
+    >
+      {message}
+    </Button>
+    <input
+      type="file"
+      onChange={onChange}
+      multiple={multiple}
+      required={required}
+      style={{fontSize: '100px', position: 'absolute', left: '0', top: '0', opacity: '0'}}
+    />
+  </div>
+)
+
+const FileList = styled.ul`
+  list-style-position: inside;
+  margin-top:0px;
+  padding:10px;
+  font-style: italic;
+  color:${theme.textSecondary};
+  background-color:${theme.infoBackground};
+  border-radius:5px;
+  & li {
+    font-style: normal;
+  }
+`
 
 const TextArea = styled.textarea`
   width:100%;

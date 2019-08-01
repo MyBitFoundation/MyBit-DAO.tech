@@ -6,10 +6,15 @@ interface OperatorsInterface {
   function events() external view returns(address);
   function registerOperator(address _operatorAddress, string _operatorURI, string _ipfs, address _referrerAddress) external;
   function removeOperator(bytes32 _operatorID) external;
+  function addAsset(bytes32 _operatorID, string _name, string _ipfs, bool _acceptCrypto, bool _payoutCrypto, address _token) external returns (bool);
+  function removeAsset(bytes32 _modelID) external returns (bool);
+  function updateIPFS(bytes32 _operatorID, string _ipfs) external returns(bool);
+  function updateModelIPFS(bytes32 _modelID, string _ipfs) external returns(bool);
 }
 
 interface APIInterface {
   function getOperatorAddress(bytes32 _operatorID) external view returns(address);
+  function getModelOperator(bytes32 _modelID) external view returns(address);
   function getOperatorID(address _operatorAddress) external view returns(bytes32);
 }
 
@@ -33,6 +38,8 @@ contract OperatorsWrapper is AragonApp {
 
     event NewRequest(bytes32 operatorID, string name, address operatorAddress, address referrerAddress, string ipfs);
     event NewOperator(bytes32 operatorID);
+    event RemovedAsset(address operator, bytes32 operatorID, bytes32 modelID);
+    event NewIPFS(address operator, bytes32 id, string ipfs, bool isModel);
 
     /**
     * @notice Initialize OperatorsWrapper contract
@@ -89,6 +96,32 @@ contract OperatorsWrapper is AragonApp {
           _ipfs
       );
       emit NewRequest(operatorID, _name, _operatorAddress, _referrerAddress, _ipfs);
+    }
+
+    function addOperatorAsset(bytes32 _operatorID, string _name, string _ipfs, bool _acceptCrypto, bool _payoutCrypto, address _token)
+    external {
+      require(api.getOperatorAddress(_operatorID) == msg.sender);
+      operators.addAsset(_operatorID, _name, _ipfs, _acceptCrypto, _payoutCrypto, _token);
+    }
+
+    function removeOperatorAsset(bytes32 _modelID)
+    external {
+      require(api.getModelOperator(_modelID) == msg.sender);
+      operators.removeAsset(_modelID);
+    }
+
+    function changeOperatorIPFS(bytes32 _operatorID, string _ipfs)
+    external {
+      require(api.getOperatorAddress(_operatorID) == msg.sender);
+      operators.updateIPFS(_operatorID, _ipfs);
+      emit NewIPFS(msg.sender, _operatorID, _ipfs, false);
+    }
+
+    function changeModelIPFS(bytes32 _modelID, string _ipfs)
+    external {
+      require(api.getModelOperator(_modelID) == msg.sender);
+      operators.updateModelIPFS(_modelID, _ipfs);
+      emit NewIPFS(msg.sender, _modelID, _ipfs, true);
     }
 
     function getEvents() external view returns (address){

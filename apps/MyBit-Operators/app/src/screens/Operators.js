@@ -6,16 +6,20 @@ import {
   Table,
   TableHeader,
   TableRow,
+  Text,
   Viewport,
   breakpoint,
 } from '@aragon/ui'
 import OperatorRow from '../components/OperatorRow'
+import AssetCard from '../components/AssetCard'
+import { addressesEqual } from '../web3-utils'
 
 class Operators extends React.Component {
   static propTypes = {
     operators: PropTypes.array,
   }
   static defaultProps = {
+    assets: [],
     confirmed: [],
     proposals: [],
     requests: [],
@@ -24,14 +28,18 @@ class Operators extends React.Component {
   state = { selectedTab: 0 }
   render() {
     const {
+      assets,
       confirmed,
       proposals,
       requests,
       approved,
       userAccount,
+      isOperator,
+      ipfsAPI,
       ipfsURL,
       onOnboardOperator,
       onRemoveOperator,
+      onRemoveAsset,
     } = this.props
     const { selectedTab } = this.state
 
@@ -41,12 +49,36 @@ class Operators extends React.Component {
     if(confirmed.length > 0) items.push('Confirmed')
     if(approved.length > 0) items.push('Awaiting Confirmation...')
 
+    const operatorAssets = assets.filter(({ address }) => (addressesEqual(address, userAccount)));
+
     return (
       <Viewport>
         {({ below }) => {
           const compactTable = below('medium')
           return (
             <Main>
+              {isOperator && (operatorAssets.length > 0) && (
+                <Assets>
+                  <Text.Block size="large" weight="bold" style={{ marginLeft: '20px', marginBottom: '10px', width: '100%' }}>
+                    Your Assets
+                  </Text.Block>
+                  <Grid>
+                    {operatorAssets.map(({ id, name, ipfs }) => (
+                        <AssetCard
+                          key={id}
+                          id={id}
+                          name={name}
+                          ipfs={ipfs}
+                          ipfsAPI={ipfsAPI}
+                          ipfsURL={ipfsURL}
+                          onRemoveAsset={onRemoveAsset}
+                        />
+                      )
+                    )}
+                  </Grid>
+                </Assets>
+              )}
+
               <TabBarWrapper>
                 <TabBar
                   items={items}
@@ -186,6 +218,40 @@ const Main = styled.div`
     `
       width: 100%;
     `
+  )};
+`
+
+const Assets = styled.div`
+  margin-top:20px;
+  margin-bottom:20px;
+  width: calc(100% - 20px);
+  ${breakpoint(
+    'medium',
+    `
+      margin-top:0;
+      width:100%;
+     `
+  )};
+`
+
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 30px;
+  margin-left:20px;
+
+  ${breakpoint(
+    'small',
+    `
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+     `
+  )};
+
+  ${breakpoint(
+    'medium',
+    `
+      margin-left:0;
+     `
   )};
 `
 

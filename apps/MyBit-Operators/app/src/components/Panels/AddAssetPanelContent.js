@@ -1,35 +1,47 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Button, Field, DropDown, IconError, Text, TextInput, Info, theme } from '@aragon/ui'
+import { Button, Field, DropDown, IconError, Radio, RadioGroup, Text, TextInput, Info, theme } from '@aragon/ui'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import { isAddress } from '../../web3-utils'
 import { isEmail, isURL} from 'validator'
 
+const CRYPTO_OPTIONS = {
+  'accept_no': false,
+  'accept_yes': true,
+  'payout_no': false,
+  'payout_yes': true
+}
+const CRYPTO_LABELS = ['Yes', 'No']
+const TOKEN_LABELS = ['Dai', 'Eth']
+const TOKEN_VALUES = ['0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', '0x0000000000000000000000000000000000000000']
+const CATEGORY_LABELS = ['Crypto', 'Energy', 'Machinery', 'Real Estate', 'Transportation', 'Other']
+
 const initialState = {
   nameField: '',
-  emailField: '',
   urlField: '',
-  descriptionField: '',
-  addressField: '',
-  referrerField: '',
-  docBufferArray: [],
-  finBufferArray: [],
-  docFileList: [],
-  finFileList: [],
+  priceField: 0,
+  categoryIndex: 0,
+  tokenIndex: 0,
+  acceptActive: 'accept_no',
+  payoutActive: 'payout_no',
+  imgBufferArray: [],
+  fileBufferArray: [],
+  imgList: [],
+  fileList: [],
   loading: false,
   error: null,
   warning: null,
 }
 
-class RequestOperatorPanelContent extends React.Component {
+class AddAssetPanelContent extends React.Component {
   static defaultProps = {
-    submitOperator: () => {},
+    submitAsset: () => {},
   }
   state = {
     ...initialState,
   }
   _nameInput = React.createRef()
-  componentWillReceiveProps({ opened, holderAddress }) {
+  componentWillReceiveProps({ opened }) {
     if (opened && !this.props.opened) {
       // setTimeout is needed as a small hack to wait until the input is
       // on-screen before we call focus
@@ -51,19 +63,15 @@ class RequestOperatorPanelContent extends React.Component {
     return buffer
   }
 
-  filteredAddress(address) {
-    return address.trim()
-  }
-
   handleNameChange = event => {
     this.setState({
       nameField: event.target.value
     })
   }
 
-  handleEmailChange = event => {
+  handlePriceChange = event => {
     this.setState({
-      emailField: event.target.value
+      priceField: event.target.value
     })
   }
 
@@ -73,28 +81,34 @@ class RequestOperatorPanelContent extends React.Component {
     })
   }
 
-  handleDescriptionChange = event => {
+  handleCategoryChange = index => {
     this.setState({
-      descriptionField: event.target.value
+      categoryIndex: index
+     })
+  }
+
+  handleTokenChange = index =>  {
+    this.setState({
+      tokenIndex: index
     })
   }
 
-  handleAddressChange = event => {
+  handleAcceptChange = id => {
     this.setState({
-      addressField: event.target.value
+      acceptActive: id
     })
   }
 
-  handleReferrerChange = event => {
+  handlePayoutChange = id => {
     this.setState({
-      referrerField: event.target.value
+      payoutActive: id
     })
   }
 
   //Take file input from user
-  handleDocFileChange = event => {
-    const docFileList = []
-    const docBufferArray = []
+  handleImgChange = event => {
+    const imgList = []
+    const imgBufferArray = []
     event.stopPropagation()
     event.preventDefault()
     for(let i=0; i<event.target.files.length; i++){
@@ -103,24 +117,24 @@ class RequestOperatorPanelContent extends React.Component {
       reader.readAsArrayBuffer(file)
       reader.onloadend = () => {
         this.convertToBuffer(reader).then(buffer => {
-          docBufferArray.push({
+          imgBufferArray.push({
             name:file.name,
             buffer: buffer
           })
         })
       }
-      docFileList.push(file)
+      imgList.push(file)
     }
     this.setState({
-      docFileList,
-      docBufferArray
+      imgList,
+      imgBufferArray
     })
   };
 
   //Take file input from user
-  handleFinFileChange = event => {
-    const finFileList = []
-    const finBufferArray = []
+  handleFileChange = event => {
+    const fileList = []
+    const fileBufferArray = []
     event.stopPropagation()
     event.preventDefault()
     for(let i=0; i<event.target.files.length; i++){
@@ -129,45 +143,39 @@ class RequestOperatorPanelContent extends React.Component {
       reader.readAsArrayBuffer(file)
       reader.onloadend = () => {
         this.convertToBuffer(reader).then(buffer => {
-          finBufferArray.push({
+          fileBufferArray.push({
             name:file.name,
             buffer: buffer
           })
         })
       }
-      finFileList.push(file)
+      fileList.push(file)
     }
     this.setState({
-      finFileList,
-      finBufferArray
+      fileList,
+      fileBufferArray
     })
   };
 
   handleSubmit = event => {
     event.preventDefault()
-    const { nameField, emailField, urlField, descriptionField, addressField, referrerField, docBufferArray, finBufferArray } = this.state
-    const operatorAddress = this.filteredAddress(addressField)
-    const referrerAddress = this.filteredAddress(referrerField)
+    const { nameField,
+            priceField,
+            urlField,
+            categoryIndex,
+            tokenIndex,
+            acceptActive,
+            payoutActive,
+            imgBufferArray,
+            fileBufferArray
+    } = this.state
     let error
 
-    error = !isAddress(operatorAddress)
-      ? "Operator address must be a valid Ethereum address"
-      : null
-
-    error = (referrerAddress != '' && !isAddress(referrerAddress))
-      ? "Referrer address must be a valid Ethereum address"
-      : error
-
-    error = (operatorAddress.toLowerCase() == referrerAddress.toLowerCase())
-      ? "The operator cannot refer themselves"
-      : error
-
-    error = (urlField != '' && !isURL(urlField))
+    error = (!isURL(urlField))
       ? "Website invalid"
       : error
-
-    error = (!isEmail(emailField))
-      ? "Email invalid"
+    error = (imgBufferArray.length === 0)
+      ? "Please submit at least one image"
       : error
 
     // Error
@@ -180,46 +188,47 @@ class RequestOperatorPanelContent extends React.Component {
 
     this.setState({loading: true})
 
-    this.props.submitOperator({
+    this.props.submitAsset({
       name: nameField,
-      email: emailField,
+      price: priceField,
       url: urlField,
-      description: descriptionField,
-      address: operatorAddress,
-      referrer: referrerAddress,
-      docBufferArray: docBufferArray,
-      finBufferArray: finBufferArray
+      category: CATEGORY_LABELS[categoryIndex],
+      token: TOKEN_VALUES[tokenIndex],
+      acceptCrypto: CRYPTO_OPTIONS[acceptActive],
+      payoutCrypto: CRYPTO_OPTIONS[payoutActive],
+      imgBufferArray: imgBufferArray,
+      fileBufferArray: fileBufferArray
     })
   }
 
   render() {
     const {
       nameField,
-      emailField,
+      priceField,
       urlField,
-      descriptionField,
-      addressField,
-      referrerField,
-      assetField,
-      docFileList,
-      finFileList,
+      categoryIndex,
+      tokenIndex,
+      acceptActive,
+      payoutActive,
+      imgList,
+      fileList,
       loading,
       error,
       warning
     } = this.state
 
-    let docFileListHTML = "No files uploaded"
-    let finFileListHTML = "No files uploaded"
-    if(docFileList.length > 0){
-      docFileListHTML = []
-      docFileList.forEach(function (file, index){
-        docFileListHTML.push(<li key={index}>{file.name}</li>)
+    let imgListHTML = "No images uploaded"
+    let fileListHTML = "No files uploaded"
+    if(imgList.length > 0){
+      imgListHTML = []
+      imgList.forEach(function (file, index){
+        imgListHTML.push(<li key={index}>{file.name}</li>)
       })
     }
-    if(finFileList.length > 0){
-      finFileListHTML = []
-      finFileList.forEach(function (file, index){
-        finFileListHTML.push(<li key={index}>{file.name}</li>)
+    if(fileList.length > 0){
+      fileListHTML = []
+      fileList.forEach(function (file, index){
+        fileListHTML.push(<li key={index}>{file.name}</li>)
       })
     }
 
@@ -227,12 +236,12 @@ class RequestOperatorPanelContent extends React.Component {
       <div>
         <form onSubmit={this.handleSubmit}>
           <InfoMessage
-            title="New Request"
-            text="This action will request that an operator gets added to the MyBit Go platform"
+            title="New Asset"
+            text="This action will create a new asset that gets added to the MyBit Go platform"
           />
 
           <Field
-            label="Legal Name"
+            label="Asset Name"
           >
             <TextInput
               ref={this._nameInput}
@@ -243,15 +252,14 @@ class RequestOperatorPanelContent extends React.Component {
             />
           </Field>
 
-          <Field
-            label="Email"
-          >
-            <TextInput
-              ref={this._emailInput}
-              value={emailField}
-              onChange={this.handleEmailChange}
-              wide
+          <Field label="Price (USD)">
+            <TextInput.Number
+              value={priceField}
+              onChange={this.handlePriceChange}
+              min='0'
+              step='0.01'
               required
+              wide
             />
           </Field>
 
@@ -262,69 +270,76 @@ class RequestOperatorPanelContent extends React.Component {
               ref={this._urlInput}
               value={urlField}
               onChange={this.handleURLChange}
-              wide
-            />
-          </Field>
-
-          <Field
-            label='Description'
-          >
-            <TextArea
-              ref={this._descriptionInput}
-              value={descriptionField}
-              onChange={this.handleDescriptionChange}
-              wide
-            />
-          </Field>
-
-          <Field
-            label={`
-              Operator Address
-              (must be a valid Ethereum address)
-            `}
-          >
-            <TextInput
-              ref={this._addressInput}
-              value={addressField}
-              onChange={this.handleAddressChange}
-              wide
               required
-            />
-          </Field>
-
-          <Field
-            label={`
-              Referrer Address
-              (must be a valid Ethereum address)
-            `}
-          >
-            <TextInput
-              ref={this._referrerInput}
-              value={referrerField}
-              onChange={this.handleReferrerChange}
               wide
             />
+          </Field>
+          <Field
+            label="Category"
+          >
+            <DropDown
+              items={CATEGORY_LABELS}
+              active={categoryIndex}
+              onChange={this.handleCategoryChange}
+              wide
+            />
+          </Field>
+          <Field
+            label="Payment Token"
+          >
+            <DropDown
+              items={TOKEN_LABELS}
+              active={tokenIndex}
+              onChange={this.handleTokenChange}
+              wide
+            />
+          </Field>
+          <Field label={`Can the asset be purchased with ${TOKEN_LABELS[tokenIndex]}?`}>
+            <RadioGroup onChange={this.handleAcceptChange} selected={acceptActive}>
+              {CRYPTO_LABELS.map((label, i) => {
+                const radioId = `accept_${label.toLowerCase()}`
+                return (
+                  <label key={i}>
+                    {label}
+                    <Radio id={radioId} css='margin-right:20px'/>
+                  </label>
+                )
+              })}
+            </RadioGroup>
+          </Field>
+          <Field label={`Will the asset distribute income using ${TOKEN_LABELS[tokenIndex]}?`}>
+            <RadioGroup onChange={this.handlePayoutChange} selected={payoutActive}>
+              {CRYPTO_LABELS.map((label, i) => {
+                const radioId = `payout_${label.toLowerCase()}`
+                return (
+                  <label key={i}>
+                    {label}
+                    <Radio id={radioId} css='margin-right:20px'/>
+                  </label>
+                )
+              })}
+            </RadioGroup>
           </Field>
           <Field>
             <FileInput
-              message='Upload Legal Documents'
+              message='Upload Images'
               mode='secondary'
-              onChange={this.handleDocFileChange}
+              onChange={this.handleImgChange}
               multiple={true}
             />
             <FileList>
-              {docFileListHTML}
+              {imgListHTML}
             </FileList>
           </Field>
           <Field>
             <FileInput
-              message='Upload Financial Statements'
+              message='Upload Files'
               mode='secondary'
-              onChange={this.handleFinFileChange}
+              onChange={this.handleFileChange}
               multiple={true}
             />
             <FileList>
-              {finFileListHTML}
+              {fileListHTML}
             </FileList>
 
           </Field>
@@ -429,4 +444,4 @@ const Spinner = () => (
   </div>
 )
 
-export default RequestOperatorPanelContent
+export default AddAssetPanelContent

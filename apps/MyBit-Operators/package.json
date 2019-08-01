@@ -1,5 +1,5 @@
 {
-  "name": "mybit-operators-templates",
+  "name": "mybit-operators-template",
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
@@ -50,6 +50,6 @@
     "@aragon/apps-token-manager": "^2.1.0",
     "@aragon/apps-vault": "^4.1.0",
     "@aragon/apps-voting": "^2.1.0",
-    "@aragon/os": "^4.2.0"
+    "@aragon/os": "^4.2.1"
   }
 }

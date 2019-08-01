@@ -9,6 +9,7 @@
     "@aragon/ui": "^0.40.1",
     "@material-ui/core": "^4.0.2",
     "bn.js": "^4.11.6",
+    "ipfs-http-client": "^32.0.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

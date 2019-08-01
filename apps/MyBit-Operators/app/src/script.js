@@ -1,4 +1,3 @@
-import '@babel/polyfill'
 import { of } from './rxjs'
 import Aragon from '@aragon/api'
 import eventsAbi from './abi/events.json'
@@ -70,6 +69,8 @@ async function initialize(eventsAddress, votingAddress) {
           return operatorEvent(nextState, returnValues)
         case 'StartVote':
           return await updateVote(votingContract, nextState, returnValues)
+        case 'ExecuteVote':
+          return await executeVote(votingContract, nextState, returnValues)
         default:
           return nextState
       }
@@ -127,28 +128,28 @@ function newRequest(state, { operatorID, name, operatorAddress, referrerAddress,
   }
 }
 
-function operatorEvent(state, { message, messageID, operatorID, operatorURI, account, origin }) {
-  const { operators = [] } = state
+function operatorEvent(state, { message, messageID, id, name, ipfs, account, origin }) {
+  const { operators = [], assets = [] } = state
 
-  if(message == 'Operator removed') {
+  if(message === 'Operator removed') {
     const operatorIndex = operators.findIndex(operator =>
-      bytesEqual(operator.id, operatorID)
+      bytesEqual(operator.id, id)
     )
 
     if (operatorIndex !== -1) {
       operators[operatorIndex].removed = true
     }
-  } else if(message == 'Operator registered'){
+  } else if(message === 'Operator registered'){
     const operatorIndex = operators.findIndex(operator =>
-      operator.id.toLowerCase() == operatorID.toLowerCase()
+      operator.id.toLowerCase() == id.toLowerCase()
     )
     if (operatorIndex === -1) {
       operators.push({
-        id: operatorID,
-        name: operatorURI,
+        id: id,
+        name: name,
         address: account,
         referrer: '0x0000000000000000000000000000000000000000',
-        ipfs: '',
+        ipfs: ipfs,
         assetType: '',
         proposed: false,
         confirmed: true,
@@ -158,19 +159,38 @@ function operatorEvent(state, { message, messageID, operatorID, operatorURI, acc
     } else {
       operators[operatorIndex].confirmed = true
     }
+  } else if(message === 'Asset added') {
+    const assetIndex = assets.findIndex(asset =>
+      asset.id.toLowerCase() == id.toLowerCase()
+    )
+    if (assetIndex === -1) {
+      assets.push({
+        id: id,
+        name: name,
+        address: origin,
+        ipfs: ipfs,
+      })
+    }
+  } else if(message === 'Asset removed') {
+    const assetIndex = assets.findIndex(asset =>
+      asset.id.toLowerCase() == id.toLowerCase()
+    )
+    if (assetIndex !== -1) {
+      assets.splice(assetIndex, 1)
+    }
   }
 
   return {
     ...state,
-    operators
+    operators,
+    assets,
   }
 }
 
-async function updateVote(voting, state, { voteId, creator }) {
+async function updateVote(voting, state, { voteId }) {
   if(state.thisAddress){
     const { thisAddress, operators = [] } = state
     const { open, executed, supportRequired, minAcceptQuorum, yea, nay, votingPower, script } = await getVote(voting, voteId)
-    const pctBase = new BN(10).pow(new BN(18))
     if(script.includes(thisAddress.substr(2).toLowerCase())) {
       const bytes = `0x${script.slice(194)}`
       const hexLength = bytes.length-2
@@ -190,6 +210,7 @@ async function updateVote(voting, state, { voteId, creator }) {
           if (totalVotes.isZero()) {
             operators[operatorIndex].failed = true
           } else {
+            const pctBase = new BN(10).pow(new BN(18))
             const yeaPct = bnYea.mul(pctBase).div(totalVotes)
             const yeaOfTotalPowerPct = bnYea.mul(pctBase).div(bnVotingPower)
             // Mirror on-chain calculation
@@ -202,7 +223,34 @@ async function updateVote(voting, state, { voteId, creator }) {
               operators[operatorIndex].failed = true
             }
           }
+        } else if(executed === true) {
+          operators[operatorIndex].approved = true
         }
+      }
+      return {
+        ...state,
+        operators
+      }
+    } else {
+      return state
+    }
+  } else {
+    return state
+  }
+}
+
+async function executeVote(voting, state, { voteId }) {
+  if(state.thisAddress){
+    const { thisAddress, operators = [] } = state
+    const { open, executed, supportRequired, minAcceptQuorum, yea, nay, votingPower, script } = await getVote(voting, voteId)
+    if(script.includes(thisAddress.substr(2).toLowerCase())) {
+      const bytes = `0x${script.slice(194)}`
+      const hexLength = bytes.length-2
+      const operatorIndex = operators.findIndex(operator =>
+        padRight(asciiToHex(operator.name), hexLength) === bytes
+      )
+      if (operatorIndex !== -1) {
+        operators[operatorIndex].approved = true
       }
       return {
         ...state,
