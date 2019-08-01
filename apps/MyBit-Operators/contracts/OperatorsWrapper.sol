@@ -10,6 +10,7 @@ interface OperatorsInterface {
   function removeAsset(bytes32 _modelID) external returns (bool);
   function updateIPFS(bytes32 _operatorID, string _ipfs) external returns(bool);
   function updateModelIPFS(bytes32 _modelID, string _ipfs) external returns(bool);
+  function updateModelOperator(bytes32 _modelID, address _newAddress) external returns(bool);
 }
 
 interface APIInterface {
@@ -40,6 +41,7 @@ contract OperatorsWrapper is AragonApp {
     event NewOperator(bytes32 operatorID);
     event RemovedAsset(address operator, bytes32 operatorID, bytes32 modelID);
     event NewIPFS(address operator, bytes32 id, string ipfs, bool isModel);
+    event NewModelOperator(bytes32 modelID, address oldAddress, address newAddress);
 
     /**
     * @notice Initialize OperatorsWrapper contract
@@ -98,18 +100,27 @@ contract OperatorsWrapper is AragonApp {
       emit NewRequest(operatorID, _name, _operatorAddress, _referrerAddress, _ipfs);
     }
 
+    /**
+    * @notice Add an asset to the MyBit Go Platform
+    */
     function addOperatorAsset(bytes32 _operatorID, string _name, string _ipfs, bool _acceptCrypto, bool _payoutCrypto, address _token)
     external {
       require(api.getOperatorAddress(_operatorID) == msg.sender);
       operators.addAsset(_operatorID, _name, _ipfs, _acceptCrypto, _payoutCrypto, _token);
     }
 
+    /**
+    * @notice Remove an asset from the MyBit Go Platform
+    */
     function removeOperatorAsset(bytes32 _modelID)
     external {
       require(api.getModelOperator(_modelID) == msg.sender);
       operators.removeAsset(_modelID);
     }
 
+    /**
+    * @notice Update operator's IPFS hash
+    */
     function changeOperatorIPFS(bytes32 _operatorID, string _ipfs)
     external {
       require(api.getOperatorAddress(_operatorID) == msg.sender);
@@ -117,6 +128,9 @@ contract OperatorsWrapper is AragonApp {
       emit NewIPFS(msg.sender, _operatorID, _ipfs, false);
     }
 
+    /**
+    * @notice Update model's IPFS hash
+    */
     function changeModelIPFS(bytes32 _modelID, string _ipfs)
     external {
       require(api.getModelOperator(_modelID) == msg.sender);
@@ -124,14 +138,33 @@ contract OperatorsWrapper is AragonApp {
       emit NewIPFS(msg.sender, _modelID, _ipfs, true);
     }
 
+    /**
+    * @notice Update model's operator address
+    */
+    function changeModelOperator(bytes32 _modelID, address _newAddress)
+    external {
+      require(api.getModelOperator(_modelID) == msg.sender);
+      operators.updateModelOperator(_modelID, _newAddress);
+      emit NewModelOperator(_modelID, msg.sender, _newAddress);
+    }
+
+    /**
+    * @notice Get the current Events contract
+    */
     function getEvents() external view returns (address){
       return operators.events();
     }
 
+    /**
+    * @notice Update the Operators contract
+    */
     function changeOperatorsContract(address _newAddress) external auth(MANAGER_ROLE) {
       operators = OperatorsInterface(_newAddress);
     }
 
+    /**
+    * @notice Update the API contract
+    */
     function changeAPIContract(address _newAddress) external auth(MANAGER_ROLE) {
       api = APIInterface(_newAddress);
     }
