@@ -1,11 +1,19 @@
 #Deployments
 ## Mainnet
+### mybit-operators.open.aragonpm.eth v1.0.1:
+ - Content (ipfs): QmXqYXxMxFA72ytDr3TgWiJSeTE2bHhtnSoUHfKZ7piH9m
+ - Transaction hash: 0x2b5b7dc593c6bd7ec96f32b21d003824ef56803470787d3e4da1953c7db8d8a2
+
 ### mybit-operators.open.aragonpm.eth v1.0.0:
  - Contract address: 0x12C9900248a2D62353A659220f59842b2BB4Cf86
  - Content (ipfs): Qmb4tswijrX37cq9TfgmP9K6YSJfnkUnW4PvfdcHqAhLcx
  - Transaction hash: 0xbabde7726e7020d0d2aee23b3c6bf2828936377f5b791c9771e2dea822e4b5d0
 
 ## Rinkeby
+### mybit-operators.open.aragonpm.eth v2.0.1:
+ - Content (ipfs): QmWEX4JJZGYnwxwmHDgxXLSbuw5o7bZDY6N9PbFTzcH2eF
+ - Transaction hash: 0x2c0f049e8fcf55a13ea22a59b3f876cff47e3c25aa0f3b975a051003cb45cd01
+
 ### mybit-operators.open.aragonpm.eth v2.0.0:
  - Contract address: 0x5f6b52ff9aCB3AC221f19B331ae2Ad601AF3DAd6
  - Content (ipfs): QmWE55BvMDWXnnJ6RSxSEVEedjfnVDXeKCkGiKdTRrSH7v
