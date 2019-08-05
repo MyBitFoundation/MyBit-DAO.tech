@@ -70,6 +70,7 @@ contract Template is TemplateBase {
         operators = new Operators(address(database), address(events));
         contractManager.addContract('Operators', address(operators));
         contractManager.addContract('Template', address(this));
+        operators.registerOperator(msg.sender, 'MyBit', 'Qmehrm7FihTscxVr2GXvqf7YWGy7gxzVhKcAMbcG', address(0));
     }
 
     function newInstance() {

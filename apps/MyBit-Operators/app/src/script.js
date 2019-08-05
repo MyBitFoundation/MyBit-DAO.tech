@@ -79,7 +79,7 @@ async function initialize(eventsAddress, votingAddress) {
       // Always initialize the store with our own home-made event
       of({ event: INITIALIZATION_TRIGGER }),
       // Merge in the event contract's events into the app's own events for the store
-      eventsContract.events(),
+      eventsContract.events(0),
       votingContract.events()
     ])
 }
